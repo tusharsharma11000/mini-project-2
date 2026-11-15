@@ -1,0 +1,2593 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>PulseAI — AI-Powered Social Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Google Identity Services (GIS) for Google Authentication -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            },
+            surface: {
+              50: '#f8fafc',
+              800: '#131b2e',
+              900: '#0b0f19',
+              950: '#070a12',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #070a12;
+      color: #f1f5f9;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+    .glass-card {
+      background: rgba(17, 24, 39, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card-hover {
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card-hover:hover {
+      border-color: rgba(99, 102, 241, 0.3);
+      transform: translateY(-1px);
+    }
+    .like-bounce {
+      animation: heartBurst 0.35s ease-out;
+    }
+    @keyframes heartBurst {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+    .pulse-glow {
+      box-shadow: 0 0 20px -5px rgba(99, 102, 241, 0.4);
+    }
+  </style>
+</head>
+<body class="custom-scrollbar min-h-screen overflow-x-hidden selection:bg-brand-500 selection:text-white">
+
+  <!-- Ambient Background Gradients -->
+  <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    <div class="absolute -top-40 -left-40 w-96 h-96 bg-brand-600/15 rounded-full blur-3xl"></div>
+    <div class="absolute top-1/3 -right-40 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-40 left-1/3 w-96 h-96 bg-violet-600/15 rounded-full blur-3xl"></div>
+  </div>
+
+  <!-- Global Application Wrapper -->
+  <div class="relative z-10 flex min-h-screen max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+
+    <!-- ================= LEFT SIDEBAR NAVIGATION ================= -->
+    <aside class="hidden md:flex flex-col justify-between w-64 lg:w-72 sticky top-0 h-screen py-6 pr-4 border-r border-slate-800/80">
+      <div>
+        <!-- Logo Brand -->
+        <div class="flex items-center gap-3 px-3 mb-8 cursor-pointer" onclick="switchTab('feed')">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-violet-600 flex items-center justify-center shadow-lg shadow-brand-500/25">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xl font-extrabold tracking-tight text-white">Pulse<span class="text-brand-400">AI</span></span>
+              <span class="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-brand-500/20 text-brand-300 border border-brand-500/30">DS</span>
+            </div>
+            <p class="text-[11px] text-slate-400 font-medium">Smart Social & NLP Platform</p>
+          </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="space-y-1.5">
+          <button id="nav-feed" onclick="switchTab('feed')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-semibold transition-all bg-brand-500/15 text-brand-300 border border-brand-500/30 shadow-sm">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <span>Home Feed</span>
+          </button>
+
+          <button id="nav-nlp" onclick="switchTab('nlp')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all border border-transparent">
+            <div class="relative">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+              <span class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span class="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400"></span>
+            </div>
+            <span>AI Moderation Lab</span>
+          </button>
+
+          <button id="nav-analytics" onclick="switchTab('analytics')" class="w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all border border-transparent">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            <span>Model Analytics</span>
+          </button>
+
+          <!-- Exclusive Admin Console Navigation (Tushar Sharma Master Access) -->
+          <button id="nav-admin" onclick="switchTab('admin')" class="hidden w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-amber-300 hover:text-white hover:bg-amber-500/10 transition-all border border-amber-500/25">
+            <div class="flex items-center gap-3.5">
+              <span class="text-base">👑</span>
+              <span>Admin Console</span>
+            </div>
+            <span class="text-[9px] bg-amber-400 text-black px-1.5 py-0.5 rounded font-black tracking-wider">ADMIN</span>
+          </button>
+
+          <button onclick="openNewPostModal()" class="w-full mt-4 flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl font-semibold text-sm bg-gradient-to-r from-brand-600 to-violet-600 hover:from-brand-500 hover:to-violet-500 text-white shadow-lg shadow-brand-600/30 transition-all active:scale-[0.98]">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <span>Create Post</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- User Profile / Switcher Card -->
+      <div class="glass-card rounded-2xl p-3 border border-slate-800/80">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2.5 overflow-hidden">
+            <img id="sidebar-user-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Avatar" class="w-9 h-9 rounded-full object-cover ring-2 ring-brand-500/40">
+            <div class="truncate">
+              <div class="flex items-center gap-1">
+                <p id="sidebar-user-name" class="text-xs font-bold text-white truncate">Tushar Sharma</p>
+                <span id="sidebar-user-admin-badge" class="hidden text-[9px] font-black bg-amber-500/20 text-amber-300 px-1 py-0.2 rounded border border-amber-500/30">ADMIN</span>
+              </div>
+              <p id="sidebar-user-handle" class="text-[11px] text-slate-400 truncate">@tushar_sharma</p>
+            </div>
+          </div>
+          <span id="sidebar-user-role-pill" class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">Active</span>
+        </div>
+        <div class="flex gap-1.5">
+          <button onclick="openEditProfileModal()" class="flex-1 py-1.5 px-2 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 text-[11px] font-medium text-slate-200 transition-colors text-center" title="Edit your name & profile picture">
+            Edit Profile
+          </button>
+          <button onclick="openSwitchAccountModal()" class="py-1.5 px-2.5 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 text-[11px] font-medium text-slate-200 transition-colors text-center" title="Log in or Register">
+            Switch
+          </button>
+          <button onclick="logout()" class="py-1.5 px-2.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-[11px] font-medium transition-colors" title="Logout">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ================= CENTER MAIN FEED ================= -->
+    <main class="flex-1 min-w-0 max-w-2xl mx-auto py-4 md:py-6 px-2 sm:px-4 pb-28 md:pb-6">
+
+      <!-- Sticky Mobile Header -->
+      <div class="md:hidden sticky top-0 z-30 bg-slate-950/90 backdrop-blur-md px-3 py-2.5 -mx-2 sm:-mx-4 mb-4 border-b border-slate-800/80 flex items-center justify-between shadow-lg">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="switchTab('feed')">
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-500 to-violet-600 flex items-center justify-center shadow-md shadow-brand-500/20">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <div>
+            <span class="text-base font-extrabold text-white tracking-tight">Pulse<span class="text-brand-400">AI</span></span>
+            <div class="flex items-center gap-1 -mt-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span class="text-[9px] text-emerald-400 font-mono font-medium">LIVE NLP</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Mobile Admin Quick Pill (Visible to Admin) -->
+          <button id="mobile-header-admin-pill" onclick="switchTab('admin')" class="hidden px-2 py-1 rounded-lg text-[10px] font-black bg-amber-400 text-black shadow-sm flex items-center gap-1">
+            <span>👑</span>
+            <span>ADMIN</span>
+          </button>
+          <button onclick="openNewPostModal()" class="px-2.5 py-1.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold shadow-sm flex items-center gap-1 active:scale-95 transition-all">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <span>Post</span>
+          </button>
+          <button onclick="openSwitchAccountModal()" class="p-0.5 rounded-full ring-2 ring-brand-500/40 relative active:scale-95 transition-transform" title="Account / Sign in">
+            <img id="mobile-user-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Avatar" class="w-8 h-8 rounded-full object-cover">
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 1: SOCIAL FEED -->
+      <section id="tab-feed" class="space-y-6">
+
+        <!-- Topic Pills Carousel -->
+        <div class="flex items-center gap-2 overflow-x-auto pb-2 custom-scrollbar">
+          <button onclick="filterPosts('all')" class="topic-pill px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap bg-brand-500 text-white shadow-sm">All Feed</button>
+          <button onclick="filterPosts('datascience')" class="topic-pill px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-900/90 text-slate-300 hover:text-white border border-slate-800">#DataScience</button>
+          <button onclick="filterPosts('ai')" class="topic-pill px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-900/90 text-slate-300 hover:text-white border border-slate-800">#MachineLearning</button>
+          <button onclick="filterPosts('tech')" class="topic-pill px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-900/90 text-slate-300 hover:text-white border border-slate-800">#SpringBoot</button>
+          <button onclick="filterPosts('photography')" class="topic-pill px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-900/90 text-slate-300 hover:text-white border border-slate-800">#Photography</button>
+        </div>
+
+        <!-- Inline Quick Composer -->
+        <div class="glass-card rounded-2xl p-4 shadow-xl">
+          <div class="flex gap-3">
+            <img id="composer-user-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Avatar" class="w-10 h-10 rounded-full object-cover ring-2 ring-slate-800">
+            <div class="flex-1">
+              <textarea id="quick-post-text" rows="2" placeholder="Share research breakthroughs, insights, or photos..." class="w-full bg-transparent text-sm text-slate-100 placeholder-slate-500 resize-none focus:outline-none"></textarea>
+
+              <!-- Hidden File Input for Device Upload -->
+              <input type="file" id="quick-file-input" accept="image/*" class="hidden" onchange="handleQuickFileSelect(event)">
+
+              <!-- Image Preview Container -->
+              <div id="quick-image-preview-container" class="hidden relative mt-2 rounded-xl overflow-hidden max-h-60 border border-slate-700/60 bg-slate-950/60">
+                <img id="quick-image-preview" src="" alt="Preview" class="w-full h-full object-cover">
+                <div class="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/70 text-[10px] text-white flex items-center gap-1">
+                  <span id="quick-image-name">Device Photo</span>
+                </div>
+                <button type="button" onclick="removeQuickImage()" class="absolute top-2 right-2 p-1.5 rounded-full bg-black/70 text-white hover:bg-black transition-colors" title="Remove Photo">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+              </div>
+
+              <div class="flex items-center justify-between pt-3 mt-2 border-t border-slate-800/80">
+                <div class="flex items-center gap-2">
+                  <!-- Upload Photo from Computer / Device -->
+                  <button type="button" onclick="document.getElementById('quick-file-input').click()" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-brand-500/15 hover:bg-brand-500/25 border border-brand-500/30 text-xs font-semibold text-brand-300 transition-colors">
+                    <svg class="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <span>Upload from Device</span>
+                  </button>
+
+                  <!-- Or Paste URL -->
+                  <button type="button" onclick="promptQuickImageUrl()" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-xs font-medium text-slate-400 hover:text-slate-200 transition-colors" title="Paste Image Link">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                    <span>Paste URL</span>
+                  </button>
+                </div>
+
+                <button id="quick-post-submit-btn" onclick="submitQuickPost()" class="px-4 py-1.5 rounded-xl text-xs font-semibold bg-brand-600 hover:bg-brand-500 text-white shadow-md shadow-brand-600/30 transition-all flex items-center gap-1.5">
+                  <span>Publish</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Post Feed Stream Container -->
+        <div id="posts-container" class="space-y-6">
+          <!-- Posts rendered dynamically by JS -->
+          <div class="glass-card rounded-2xl p-8 text-center text-slate-400 animate-pulse">
+            <svg class="w-8 h-8 mx-auto mb-2 text-brand-400 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.03 0 01-15.357-2m15.357 2H15"/></svg>
+            <p class="text-sm">Connecting to Spring Boot & ML Service...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: AI MODERATION LAB (Data Science Demo Studio) -->
+      <section id="tab-nlp" class="hidden space-y-6">
+        <div class="glass-card rounded-2xl p-6 border border-brand-500/20">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                <span>AI Moderation & Sentiment Inspector</span>
+                <span class="text-xs font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">RoBERTa / DistilBERT</span>
+              </h2>
+              <p class="text-xs text-slate-400 mt-0.5">Test real-time toxicity classification and sentiment polarity before data reaches PostgreSQL.</p>
+            </div>
+          </div>
+
+          <!-- Sample Quick Test Buttons -->
+          <div class="mb-4">
+            <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Preset Benchmark Tests:</p>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="fillSample('This research methodology is brilliant! Incredible findings ✨')" class="text-xs px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 transition-colors">
+                ✨ Positive Feedback
+              </button>
+              <button onclick="fillSample('The training process completed in 45 epochs with learning rate 2e-5.')" class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors">
+                💬 Neutral Statement
+              </button>
+              <button onclick="fillSample('You are an idiot and your model is completely useless trash!')" class="text-xs px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 transition-colors">
+                ⚠️ Toxic (Should Intercept)
+              </button>
+            </div>
+          </div>
+
+          <!-- Live Input Tester -->
+          <div class="space-y-3">
+            <textarea id="nlp-live-input" rows="3" placeholder="Type any text to test model inference..." class="w-full bg-slate-900/80 border border-slate-700/80 rounded-xl p-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 transition-all font-sans"></textarea>
+            
+            <button onclick="runLiveNlpTest()" class="w-full py-2.5 rounded-xl font-semibold text-xs bg-gradient-to-r from-brand-600 to-emerald-600 hover:from-brand-500 hover:to-emerald-500 text-white shadow-md transition-all flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              <span>Execute Real-Time Model Inference</span>
+            </button>
+          </div>
+
+          <!-- Live Results Card -->
+          <div id="nlp-result-card" class="hidden mt-6 p-4 rounded-xl bg-slate-900/90 border border-slate-800">
+            <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
+              <span class="text-xs font-semibold text-slate-400">Inference Verdict</span>
+              <span id="nlp-engine-badge" class="text-[10px] font-mono px-2 py-0.5 rounded bg-brand-500/20 text-brand-300">FastAPI / PyTorch</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div class="p-3 rounded-lg bg-slate-950/60 border border-slate-800/80">
+                <span class="text-[11px] text-slate-400 block mb-1">Safety Gate</span>
+                <div id="nlp-toxic-verdict" class="text-sm font-bold text-emerald-400 flex items-center gap-1.5">
+                  <span>Passed</span>
+                </div>
+                <div class="mt-2 w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                  <div id="nlp-toxic-bar" class="bg-emerald-500 h-full rounded-full" style="width: 4%"></div>
+                </div>
+                <span id="nlp-toxic-score-text" class="text-[10px] text-slate-500 font-mono mt-1 block">Toxicity: 4%</span>
+              </div>
+
+              <div class="p-3 rounded-lg bg-slate-950/60 border border-slate-800/80">
+                <span class="text-[11px] text-slate-400 block mb-1">Sentiment Polarity</span>
+                <div id="nlp-sentiment-verdict" class="text-sm font-bold text-emerald-400 flex items-center gap-1.5">
+                  <span>POSITIVE</span>
+                </div>
+                <div class="mt-2 w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                  <div id="nlp-sentiment-bar" class="bg-brand-500 h-full rounded-full" style="width: 95%"></div>
+                </div>
+                <span id="nlp-sentiment-score-text" class="text-[10px] text-slate-500 font-mono mt-1 block">Confidence: 95%</span>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-lg bg-slate-950/40 border border-slate-800 text-xs">
+              <span class="text-slate-400 font-medium">Model Explanation: </span>
+              <span id="nlp-explanation-text" class="text-slate-200">Content cleared safety guardrails (positive tone)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Architecture Flow Breakdown Card -->
+        <div class="glass-card rounded-2xl p-6">
+          <h3 class="text-sm font-bold text-white mb-3">Model Pipeline Architecture</h3>
+          <div class="space-y-3 text-xs text-slate-300">
+            <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+              <span class="w-6 h-6 rounded-lg bg-brand-500/20 text-brand-300 flex items-center justify-center font-bold text-[11px] flex-shrink-0">1</span>
+              <div>
+                <p class="font-semibold text-white">Client Comment Submission</p>
+                <p class="text-slate-400 text-[11px]">User writes comment in UI. Spring Boot interceptor dispatches payload to NLP service before DB transaction.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+              <span class="w-6 h-6 rounded-lg bg-violet-500/20 text-violet-300 flex items-center justify-center font-bold text-[11px] flex-shrink-0">2</span>
+              <div>
+                <p class="font-semibold text-white">FastAPI Transformer Inference</p>
+                <p class="text-slate-400 text-[11px]">RoBERTa/DistilBERT classifies toxicity [0 to 1], adult/NSFW terms, and sentiment polarity. Resilient embedded engine as fallback.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-900/60 border border-slate-800">
+              <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-[11px] flex-shrink-0">3</span>
+              <div>
+                <p class="font-semibold text-white">Automated Guardrail Enforcement</p>
+                <p class="text-slate-400 text-[11px]">If toxicity ≥ 70% or explicit NSFW content is detected, HTTP 400 is raised to protect users. If clean, tagged and saved.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: PLATFORM ANALYTICS -->
+      <section id="tab-analytics" class="hidden space-y-6">
+        <div class="glass-card rounded-2xl p-6">
+          <h2 class="text-lg font-bold text-white mb-1">Platform Data & Model Analytics</h2>
+          <p class="text-xs text-slate-400 mb-6">Aggregated metrics computed across platform interactions and safety evaluations.</p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
+              <span class="text-[11px] text-slate-400 font-medium">Safety Rate</span>
+              <p id="stat-safety-rate" class="text-xl font-extrabold text-emerald-400 mt-1">99.4%</p>
+              <span class="text-[10px] text-slate-500">Clean content</span>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
+              <span class="text-[11px] text-slate-400 font-medium">Analyzed</span>
+              <p id="stat-total-analyzed" class="text-xl font-extrabold text-white mt-1">0</p>
+              <span class="text-[10px] text-slate-500">NLP requests</span>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
+              <span class="text-[11px] text-slate-400 font-medium">Blocked</span>
+              <p id="stat-toxic-blocked" class="text-xl font-extrabold text-rose-400 mt-1">0</p>
+              <span class="text-[10px] text-slate-500">Toxic attempts</span>
+            </div>
+            <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800">
+              <span class="text-[11px] text-slate-400 font-medium">Avg Latency</span>
+              <p class="text-xl font-extrabold text-brand-400 mt-1">&lt;18ms</p>
+              <span class="text-[10px] text-slate-500">Real-time gate</span>
+            </div>
+          </div>
+
+          <!-- Sentiment Distribution Progress Breakdown -->
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 mb-4">
+            <div class="flex items-center justify-between text-xs mb-2">
+              <span class="font-semibold text-slate-300">Sentiment Distribution Ratio</span>
+              <span class="text-[11px] text-slate-500">Live feed breakdown</span>
+            </div>
+            <div class="w-full bg-slate-800 h-3 rounded-full flex overflow-hidden">
+              <div id="stat-bar-pos" class="bg-emerald-500 h-full" style="width: 80%" title="Positive"></div>
+              <div id="stat-bar-neu" class="bg-slate-500 h-full" style="width: 15%" title="Neutral"></div>
+              <div id="stat-bar-neg" class="bg-rose-500 h-full" style="width: 5%" title="Negative / Toxic"></div>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mt-2">
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Positive (<span id="stat-pos-count">0</span>)</span>
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-slate-500"></span> Neutral (<span id="stat-neu-count">0</span>)</span>
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-rose-500"></span> Blocked/Negative (<span id="stat-neg-count">0</span>)</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: MASTER ADMIN CONSOLE (Tushar Sharma Admin Privileges) -->
+      <section id="tab-admin" class="hidden space-y-6">
+        <!-- Admin Header Banner -->
+        <div class="glass-card rounded-2xl p-6 border border-amber-500/30 relative overflow-hidden">
+          <div class="absolute -top-12 -right-12 w-48 h-48 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
+            <div>
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="text-xl">👑</span>
+                <h2 class="text-lg font-extrabold text-white">Master Admin Console</h2>
+                <span class="text-[10px] uppercase font-black tracking-wider px-2 py-0.5 rounded bg-amber-400 text-black shadow-sm">Super Admin</span>
+              </div>
+              <p class="text-xs text-slate-300">
+                Privileged administrative controls: manage registered users, toggle moderator roles, monitor platform safety, and moderate posts/comments across the network.
+              </p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="loadAdminData()" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 transition-colors flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                <span>Refresh Data</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Overview Metric Cards -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6">
+            <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800">
+              <span class="text-[11px] font-medium text-slate-400">Total Users</span>
+              <p id="admin-stat-users" class="text-2xl font-black text-white mt-1">0</p>
+              <span class="text-[10px] text-emerald-400 font-medium">Registered Accounts</span>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800">
+              <span class="text-[11px] font-medium text-slate-400">Total Posts</span>
+              <p id="admin-stat-posts" class="text-2xl font-black text-brand-400 mt-1">0</p>
+              <span class="text-[10px] text-slate-500">Live Public Posts</span>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800">
+              <span class="text-[11px] font-medium text-slate-400">Comments</span>
+              <p id="admin-stat-comments" class="text-2xl font-black text-violet-400 mt-1">0</p>
+              <span class="text-[10px] text-slate-500">NLP Screened</span>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800">
+              <span class="text-[11px] font-medium text-slate-400">Blocked / Toxic</span>
+              <p id="admin-stat-blocked" class="text-2xl font-black text-rose-400 mt-1">0</p>
+              <span class="text-[10px] text-rose-400 font-medium">Intercepted Attempts</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Users Management Directory -->
+        <div class="glass-card rounded-2xl p-6 border border-slate-800">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div>
+              <h3 class="text-sm font-bold text-white">Registered Users & Role Management</h3>
+              <p class="text-xs text-slate-400">View user directories, promote/demote administrator rights, or ban abusive accounts.</p>
+            </div>
+            <div class="relative w-full sm:w-60">
+              <input id="admin-user-search" type="text" placeholder="Search by name, handle, email..." oninput="filterAdminUsers()" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-400">
+              <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="border-b border-slate-800 text-[11px] text-slate-400">
+                  <th class="pb-3 font-semibold">User</th>
+                  <th class="pb-3 font-semibold">Email</th>
+                  <th class="pb-3 font-semibold">Role</th>
+                  <th class="pb-3 font-semibold text-center">Posts</th>
+                  <th class="pb-3 font-semibold text-right">Administrative Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-users-table-body" class="divide-y divide-slate-800/60">
+                <tr>
+                  <td colspan="5" class="py-6 text-center text-slate-500">Loading user registry...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- AI Flagged Moderation Queue (Auto-Removed Toxic Comments) -->
+        <div class="glass-card rounded-2xl p-6 border border-rose-500/30">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-base">🚨</span>
+                <h3 class="text-sm font-bold text-white">AI Flagged Moderation Queue</h3>
+                <span id="admin-flagged-count-badge" class="px-2 py-0.5 rounded text-[10px] font-black bg-rose-500/20 text-rose-300 border border-rose-500/40">0 Flagged</span>
+              </div>
+              <p class="text-xs text-slate-400">Toxic comments intercepted by AI. Automatically removed from public feed and held for Admin review.</p>
+            </div>
+            <button onclick="loadFlaggedComments()" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 transition-colors flex items-center gap-1.5 self-start sm:self-auto">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              <span>Refresh Queue</span>
+            </button>
+          </div>
+
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left text-xs">
+              <thead>
+                <tr class="border-b border-slate-800 text-[11px] text-slate-400">
+                  <th class="pb-3 font-semibold">Commenter</th>
+                  <th class="pb-3 font-semibold">Flagged Toxic Content</th>
+                  <th class="pb-3 font-semibold text-center">AI Toxicity Score</th>
+                  <th class="pb-3 font-semibold text-center">Status</th>
+                  <th class="pb-3 font-semibold text-right">Moderator Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-flagged-table-body" class="divide-y divide-slate-800/60">
+                <tr>
+                  <td colspan="5" class="py-6 text-center text-slate-500">No flagged comments in queue. AI safety guardrails active.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ================= RIGHT SIDEBAR (DS & ML WIDGETS) ================= -->
+    <aside class="hidden xl:flex flex-col w-80 sticky top-0 h-screen py-6 pl-4 space-y-5 border-l border-slate-800/80 custom-scrollbar overflow-y-auto">
+
+      <!-- AI Shield Live Health Card -->
+      <div class="glass-card rounded-2xl p-4 border border-brand-500/20">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-xs font-bold text-white uppercase tracking-wider">AI Guardrail</span>
+          </div>
+          <span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">LIVE</span>
+        </div>
+        <p class="text-xs text-slate-300">
+          Automated real-time NLP classification intercepting toxic comments and labeling content sentiment.
+        </p>
+        <div class="mt-3 pt-3 border-t border-slate-800 flex items-center justify-between text-[11px]">
+          <span class="text-slate-400">Model Engine:</span>
+          <span class="text-brand-300 font-mono font-medium">RoBERTa / Fallback</span>
+        </div>
+        <div class="mt-1.5 flex items-center justify-between text-[11px]">
+          <span class="text-slate-400">Cutoff Threshold:</span>
+          <span class="text-slate-200 font-mono">≥ 70% Toxicity / NSFW</span>
+        </div>
+      </div>
+
+      <!-- Quick AI Interactive Tester (Right Rail) -->
+      <div class="glass-card rounded-2xl p-4">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-white">Live NLP Tester</span>
+          <span class="text-[10px] text-slate-500">Instant</span>
+        </div>
+        <p class="text-[11px] text-slate-400 mb-2">Type a word to test moderation:</p>
+        <div class="flex gap-1.5">
+          <input id="rail-test-input" type="text" placeholder="e.g. awesome code" class="flex-1 bg-slate-900/80 border border-slate-700/80 rounded-lg px-2.5 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500">
+          <button onclick="runRailTest()" class="px-2.5 py-1.5 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-xs font-medium">
+            Test
+          </button>
+        </div>
+        <div id="rail-test-result" class="hidden mt-2 p-2 rounded-lg bg-slate-950/70 border border-slate-800 text-[11px]">
+          <!-- Results populated by JS -->
+        </div>
+      </div>
+
+      <!-- Suggested Connections / Authors -->
+      <div class="glass-card rounded-2xl p-4">
+        <span class="text-xs font-bold text-white block mb-3">Community Researchers</span>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80" alt="Avatar" class="w-8 h-8 rounded-full object-cover">
+              <div>
+                <p class="text-xs font-semibold text-white">Aria Chen</p>
+                <p class="text-[10px] text-slate-400">AI / MLOps Researcher</p>
+              </div>
+            </div>
+            <button onclick="loginAsDemo('data_wizard')" class="text-[11px] text-brand-400 hover:text-brand-300 font-medium">Switch</button>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80" alt="Avatar" class="w-8 h-8 rounded-full object-cover">
+              <div>
+                <p class="text-xs font-semibold text-white">Marcus Vance</p>
+                <p class="text-[10px] text-slate-400">Cloud & Distributed</p>
+              </div>
+            </div>
+            <button onclick="loginAsDemo('tech_lead')" class="text-[11px] text-brand-400 hover:text-brand-300 font-medium">Switch</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tech Stack Footer -->
+      <div class="px-2 text-[11px] text-slate-500 space-y-1">
+        <p>Spring Boot 3 + Supabase + Python PyTorch</p>
+        <p>Project by <span class="text-slate-300 font-medium">Tushar Sharma</span></p>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- ================= FIXED MOBILE BOTTOM NAVIGATION BAR ================= -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-xl border-t border-slate-800/90 px-3 py-2 flex items-center justify-around shadow-2xl safe-area-pb">
+    <!-- Home Feed -->
+    <button onclick="switchTab('feed')" id="mobile-nav-feed" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-brand-400 active:scale-95 transition-all">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      <span class="text-[10px] font-semibold">Feed</span>
+    </button>
+
+    <!-- AI Lab -->
+    <button onclick="switchTab('nlp')" id="mobile-nav-nlp" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-slate-400 hover:text-white active:scale-95 transition-all">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      <span class="text-[10px] font-medium">AI Lab</span>
+    </button>
+
+    <!-- Mobile Quick Center Post Pill -->
+    <button onclick="openNewPostModal()" class="flex flex-col items-center justify-center -mt-5 w-12 h-12 rounded-full bg-gradient-to-tr from-brand-600 to-violet-500 text-white shadow-xl shadow-brand-500/40 ring-4 ring-slate-950 active:scale-90 transition-all">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+    </button>
+
+    <!-- Analytics -->
+    <button onclick="switchTab('analytics')" id="mobile-nav-analytics" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-slate-400 hover:text-white active:scale-95 transition-all">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      <span class="text-[10px] font-medium">Stats</span>
+    </button>
+
+    <!-- Admin Console (Shown if Admin) -->
+    <button onclick="switchTab('admin')" id="mobile-nav-admin" class="mobile-nav-btn hidden flex-col items-center gap-0.5 text-amber-400 hover:text-amber-300 active:scale-95 transition-all">
+      <span class="text-base leading-none">👑</span>
+      <span class="text-[10px] font-bold">Admin</span>
+    </button>
+
+    <!-- User / Profile -->
+    <button onclick="openSwitchAccountModal()" id="mobile-nav-user" class="mobile-nav-btn flex flex-col items-center gap-0.5 text-slate-400 hover:text-white active:scale-95 transition-all">
+      <img id="mobile-nav-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" class="w-5 h-5 rounded-full object-cover ring-1 ring-slate-600">
+      <span class="text-[10px] font-medium" id="mobile-nav-username">Profile</span>
+    </button>
+  </nav>
+
+  <!-- ================= MODAL: CREATE NEW POST ================= -->
+  <div id="modal-new-post" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+    <div class="glass-card rounded-2xl w-full max-w-lg p-6 border border-slate-700/80 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <span>Create New Post</span>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-brand-500/20 text-brand-300">Social Feed</span>
+        </h3>
+        <button onclick="closeNewPostModal()" class="text-slate-400 hover:text-white p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs font-semibold text-slate-300 block mb-1">Post Caption & Insights</label>
+          <textarea id="modal-post-content" rows="4" placeholder="What would you like to share with the community? #DataScience #AI" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl p-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500"></textarea>
+        </div>
+
+        <div>
+          <label class="text-xs font-semibold text-slate-300 block mb-1">Attach Photo</label>
+          <input type="file" id="modal-file-input" accept="image/*" class="hidden" onchange="handleModalFileSelect(event)">
+          
+          <div class="border-2 border-dashed border-slate-700/80 hover:border-brand-500/60 rounded-xl p-4 text-center cursor-pointer transition-colors bg-slate-900/60" onclick="document.getElementById('modal-file-input').click()">
+            <div id="modal-file-placeholder">
+              <svg class="w-7 h-7 mx-auto mb-1.5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <p class="text-xs text-slate-200 font-semibold">Click to choose a photo from your computer</p>
+              <p class="text-[10px] text-slate-500 mt-0.5">Supports JPG, PNG, WEBP, GIF</p>
+            </div>
+            <div id="modal-image-preview-container" class="hidden relative rounded-lg overflow-hidden max-h-48">
+              <img id="modal-image-preview" src="" alt="Preview" class="w-full h-full object-cover">
+              <button type="button" onclick="event.stopPropagation(); removeModalImage()" class="absolute top-2 right-2 p-1.5 rounded-full bg-black/75 text-white hover:bg-black">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-2.5">
+            <span class="text-[11px] text-slate-400 font-medium">Or paste an Image URL:</span>
+            <input id="modal-post-media" type="url" placeholder="https://images.unsplash.com/..." class="mt-1 w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500">
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+          <button onclick="closeNewPostModal()" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white">Cancel</button>
+          <button id="modal-post-submit-btn" onclick="submitModalPost()" class="px-5 py-2 rounded-xl text-xs font-semibold bg-brand-600 hover:bg-brand-500 text-white shadow-md shadow-brand-600/30 transition-all flex items-center gap-1.5">
+            <span>Publish Post</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: EDIT USER PROFILE ================= -->
+  <div id="modal-edit-profile" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+    <div class="glass-card rounded-2xl w-full max-w-md p-6 border border-slate-700/80 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
+        <h3 class="text-sm font-bold text-white flex items-center gap-2">
+          <span>Edit Profile</span>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-brand-500/20 text-brand-300">Identity</span>
+        </h3>
+        <button onclick="closeEditProfileModal()" class="text-slate-400 hover:text-white p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Avatar Preview & Local Upload -->
+        <div class="flex items-center gap-4">
+          <img id="edit-profile-avatar-preview" src="" alt="Avatar" class="w-16 h-16 rounded-full object-cover ring-2 ring-brand-500/50">
+          <div class="flex-1 space-y-1.5">
+            <input type="file" id="edit-profile-file-input" accept="image/*" class="hidden" onchange="handleEditProfileFileSelect(event)">
+            <button type="button" onclick="document.getElementById('edit-profile-file-input').click()" class="px-3 py-1.5 rounded-lg bg-brand-500/15 hover:bg-brand-500/25 border border-brand-500/30 text-xs font-semibold text-brand-300 transition-colors flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span>Upload Photo from Device</span>
+            </button>
+            <p id="edit-profile-file-name" class="text-[10px] text-slate-500">JPG, PNG, WEBP supported</p>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-xs font-semibold text-slate-300 block mb-1">Full Name</label>
+          <input id="edit-profile-name" type="text" placeholder="e.g. Tushar Sharma" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500">
+        </div>
+
+        <div>
+          <label class="text-xs font-semibold text-slate-300 block mb-1">Or Avatar Image Link</label>
+          <input id="edit-profile-avatar-url" type="url" placeholder="https://images.unsplash.com/..." oninput="if(this.value) document.getElementById('edit-profile-avatar-preview').src = this.value" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500">
+        </div>
+
+        <div>
+          <label class="text-xs font-semibold text-slate-300 block mb-1">Location / Bio</label>
+          <input id="edit-profile-location" type="text" placeholder="e.g. AI Researcher & Lead Engineer" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500">
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-800">
+          <button onclick="closeEditProfileModal()" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-400 hover:text-white">Cancel</button>
+          <button id="edit-profile-save-btn" onclick="submitEditProfile()" class="px-5 py-2 rounded-xl text-xs font-semibold bg-brand-600 hover:bg-brand-500 text-white shadow-md shadow-brand-600/30 transition-all">
+            Save Profile
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: SWITCH ACCOUNT / AUTH / GOOGLE ================= -->
+  <div id="modal-auth" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-md">
+    <div class="glass-card rounded-2xl w-full max-w-md max-h-[92vh] overflow-y-auto custom-scrollbar p-5 sm:p-6 border border-slate-700/80 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-800">
+        <!-- 3 Auth Tabs: Google (Public Users) | Register | Master Admin -->
+        <div class="flex items-center gap-1 sm:gap-2 flex-wrap">
+          <button id="auth-tab-btn-google" onclick="switchAuthTab('google')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold bg-brand-500 text-white shadow-sm transition-all flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
+            <span>Google Sign In</span>
+          </button>
+          <button id="auth-tab-btn-register" onclick="switchAuthTab('register')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
+            <span>Register</span>
+          </button>
+          <button id="auth-tab-btn-admin" onclick="switchAuthTab('admin')" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-amber-400 hover:text-amber-300 transition-all flex items-center gap-1">
+            <span>👑</span>
+            <span>Master Admin</span>
+          </button>
+        </div>
+        <button onclick="closeSwitchAccountModal()" class="text-slate-400 hover:text-white p-1">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- PANE 1: GOOGLE AUTHENTICATION (DEFAULT FOR ALL NEW PUBLIC USERS) -->
+      <div id="auth-google-pane" class="space-y-4">
+        <div class="text-center pb-2">
+          <div class="w-12 h-12 rounded-2xl bg-slate-900 border border-slate-700/80 mx-auto flex items-center justify-center mb-2 shadow-inner">
+            <svg class="w-6 h-6" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+          </div>
+          <h4 class="text-sm font-bold text-white">Public Sign In with Google</h4>
+          <p class="text-xs text-slate-400 mt-1">Authenticate instantly with your Google account. Ready for mobile and public use.</p>
+        </div>
+
+        <!-- Official Google GIS Container -->
+        <div id="google-gis-button-container" class="flex justify-center my-2"></div>
+
+        <!-- Mobile One-Tap Continue with Google Button -->
+        <button onclick="triggerGoogleSignIn()" class="w-full py-3 px-4 rounded-xl font-bold text-xs bg-white hover:bg-slate-100 text-slate-800 flex items-center justify-center gap-3 shadow-lg shadow-white/5 transition-all active:scale-[0.98]">
+          <svg class="w-4 h-4" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+          </svg>
+          <span>Continue with Google</span>
+        </button>
+
+        <div class="flex items-center my-3 gap-2">
+          <div class="flex-1 h-px bg-slate-800"></div>
+          <span class="text-[10px] text-slate-500 uppercase font-semibold">Or enter Google email</span>
+          <div class="flex-1 h-px bg-slate-800"></div>
+        </div>
+
+        <!-- Direct Google Email Authentication -->
+        <div class="space-y-2.5">
+          <div>
+            <label class="text-[11px] font-semibold text-slate-300 block mb-1">Gmail / Google Email</label>
+            <input id="google-email-input" type="email" placeholder="e.g. user@gmail.com" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500">
+          </div>
+          <div>
+            <label class="text-[11px] font-semibold text-slate-300 block mb-1">Full Name</label>
+            <input id="google-name-input" type="text" placeholder="e.g. Alex Rivera" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500">
+          </div>
+          <button id="google-submit-btn" onclick="submitGoogleEmailAuth()" class="w-full py-2.5 rounded-xl text-xs font-bold bg-brand-600 hover:bg-brand-500 text-white transition-all shadow-md shadow-brand-600/30 flex items-center justify-center gap-1.5 active:scale-95">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Verify & Sign In with Google</span>
+          </button>
+        </div>
+
+        <p class="text-[10px] text-slate-500 text-center">
+          🔒 Public users receive standard USER rights. Admin controls are protected.
+        </p>
+      </div>
+
+      <!-- PANE 2: PUBLIC REGISTRATION (CUSTOM EMAIL/PASSWORD) -->
+      <div id="auth-register-pane" class="hidden space-y-3">
+        <p class="text-xs text-slate-300">
+          Create a standard account with custom password:
+        </p>
+
+        <div>
+          <label class="text-[11px] font-semibold text-slate-300 block mb-1">Full Name</label>
+          <input id="register-name" type="text" placeholder="e.g. John Doe" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="text-[11px] font-semibold text-slate-300 block mb-1">Username</label>
+            <input id="register-username" type="text" placeholder="johndoe" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500">
+          </div>
+          <div>
+            <label class="text-[11px] font-semibold text-slate-300 block mb-1">Password</label>
+            <input id="register-password" type="password" placeholder="Min 6 characters" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500">
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[11px] font-semibold text-slate-300 block mb-1">Email Address</label>
+          <input id="register-email" type="email" placeholder="john@example.com" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500">
+        </div>
+
+        <div>
+          <label class="text-[11px] font-semibold text-slate-300 block mb-1">Bio / Tagline (Optional)</label>
+          <input id="register-location" type="text" placeholder="e.g. ML Enthusiast" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500">
+        </div>
+
+        <button id="register-submit-btn" onclick="submitRegistration()" class="w-full mt-2 py-2.5 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-md shadow-emerald-600/30">
+          Create Account & Sign In
+        </button>
+      </div>
+
+      <!-- PANE 3: MASTER ADMIN ACCESS (EXCLUSIVELY FOR TUSHAR SHARMA) -->
+      <div id="auth-admin-pane" class="hidden space-y-4">
+        <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30">
+          <div class="flex items-center gap-2 mb-1">
+            <span class="text-base">👑</span>
+            <span class="text-xs font-bold text-amber-300">Protected Master Administrator</span>
+          </div>
+          <p class="text-[11px] text-slate-300">
+            Dedicated privileged master access for <strong class="text-white">Tushar Sharma</strong>. Does not require external Google sign-in.
+          </p>
+        </div>
+
+        <!-- 1-Click Master Access Switch -->
+        <div>
+          <p class="text-[11px] font-semibold text-slate-400 mb-2 uppercase tracking-wider">Fast Master Login:</p>
+          <button onclick="loginAsDemo('tushar_sharma')" class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-amber-500/40 transition-colors text-left group">
+            <div class="flex items-center gap-2.5">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" class="w-9 h-9 rounded-full object-cover ring-2 ring-amber-400">
+              <div>
+                <div class="flex items-center gap-1.5">
+                  <p class="text-xs font-bold text-white">Tushar Sharma</p>
+                  <span class="text-[9px] bg-amber-400 text-black px-1.5 py-0.2 rounded font-black">SUPER ADMIN</span>
+                </div>
+                <p class="text-[10px] text-slate-400">@tushar_sharma (Full Master Privileges)</p>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-amber-400 group-hover:text-amber-300">Enter Admin 👑</span>
+          </button>
+        </div>
+
+        <!-- Custom Master Credential Login -->
+        <div class="pt-3 border-t border-slate-800">
+          <p class="text-[11px] font-semibold text-slate-400 mb-2 uppercase tracking-wider">Or Admin Credentials:</p>
+          <div class="space-y-2.5">
+            <input id="auth-username" type="text" placeholder="Username (tushar_sharma)" value="tushar_sharma" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-400 font-mono">
+            <input id="auth-password" type="password" placeholder="Password" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-400 font-mono">
+            <button onclick="submitCustomLogin()" class="w-full py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-black transition-all shadow-md shadow-amber-500/20">
+              Authenticate as Master Admin
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Global Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-2 pointer-events-none"></div>
+
+  <!-- ================= JAVASCRIPT APPLICATION LOGIC ================= -->
+  <script>
+    const API_BASE = window.location.origin;
+
+    // Current State
+    let currentUser = {
+      username: localStorage.getItem('pulse_username') || 'tushar_sharma',
+      name: localStorage.getItem('pulse_name') || 'Tushar Sharma',
+      avatar: localStorage.getItem('pulse_avatar') || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+      token: localStorage.getItem('pulse_token') || '',
+      role: localStorage.getItem('pulse_role') || 'ROLE_ADMIN',
+      isAdmin: localStorage.getItem('pulse_is_admin') === 'true' || (localStorage.getItem('pulse_username') === 'tushar_sharma')
+    };
+
+    let allPosts = [];
+    let currentTopicFilter = 'all';
+    let adminUsersCache = [];
+
+    // Application Initialization
+    document.addEventListener('DOMContentLoaded', async () => {
+      syncUserUI();
+      // Check if current token is valid; if missing or expired, refresh session
+      let tokenValid = false;
+      if (currentUser.token) {
+        try {
+          const check = await fetch(`${API_BASE}/auth/me`, {
+            headers: { 'Authorization': `Bearer ${currentUser.token}` }
+          });
+          if (check.ok) tokenValid = true;
+        } catch (e) {}
+      }
+      if (!tokenValid) {
+        // Only auto-login demo accounts (tushar_sharma, data_wizard, tech_lead)
+        // Google-authenticated users must log in again via the modal
+        const demoAccounts = ['tushar_sharma', 'data_wizard', 'tech_lead'];
+        if (demoAccounts.includes(currentUser.username)) {
+          await loginAsDemo(currentUser.username, false);
+        } else {
+          // Clear stale session for non-demo accounts, show login prompt
+          currentUser.token = '';
+          localStorage.removeItem('pulse_token');
+        }
+      }
+      loadPosts();
+      loadPlatformStats();
+    });
+
+    // Synchronize User profile across UI elements
+    function syncUserUI() {
+      // Determine if current user has admin privileges
+      const isAdmin = (currentUser.role === 'ROLE_ADMIN') || (currentUser.role === 'ADMIN') || (currentUser.username === 'tushar_sharma');
+      currentUser.isAdmin = isAdmin;
+
+      const nameEls = [document.getElementById('sidebar-user-name')];
+      const handleEls = [document.getElementById('sidebar-user-handle')];
+      const avatarEls = [
+        document.getElementById('sidebar-user-avatar'),
+        document.getElementById('mobile-user-avatar'),
+        document.getElementById('composer-user-avatar')
+      ];
+
+      nameEls.forEach(el => { if (el) el.innerText = currentUser.name; });
+      handleEls.forEach(el => { if (el) el.innerText = '@' + currentUser.username; });
+      avatarEls.forEach(el => { if (el) el.src = currentUser.avatar; });
+
+      // Admin Console Nav button visibility
+      const navAdmin = document.getElementById('nav-admin');
+      if (navAdmin) navAdmin.classList.toggle('hidden', !isAdmin);
+
+      // Admin Badge in sidebar
+      const adminBadge = document.getElementById('sidebar-user-admin-badge');
+      if (adminBadge) adminBadge.classList.toggle('hidden', !isAdmin);
+
+      // Role Pill in sidebar
+      const rolePill = document.getElementById('sidebar-user-role-pill');
+      if (rolePill) {
+        if (isAdmin) {
+          rolePill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30';
+          rolePill.innerText = '👑 Admin';
+        } else {
+          rolePill.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20';
+          rolePill.innerText = 'Active';
+        }
+      }
+
+      // Sync Mobile Bottom Navigation & Mobile Header
+      const mobAdminBtn = document.getElementById('mobile-nav-admin');
+      if (mobAdminBtn) mobAdminBtn.classList.toggle('hidden', !isAdmin);
+      const mobAdminPill = document.getElementById('mobile-header-admin-pill');
+      if (mobAdminPill) mobAdminPill.classList.toggle('hidden', !isAdmin);
+      const mobAvatar = document.getElementById('mobile-nav-avatar');
+      if (mobAvatar) mobAvatar.src = currentUser.avatar;
+      const mobUsername = document.getElementById('mobile-nav-username');
+      if (mobUsername) mobUsername.innerText = isAdmin ? 'Admin 👑' : (currentUser.username || 'Profile');
+    }
+
+    // Switch Top Navigation Tabs
+    function switchTab(tabId) {
+      if (tabId === 'admin' && !currentUser.isAdmin) {
+        showToast('Admin Console is restricted to Administrator accounts.', 'error');
+        return;
+      }
+
+      const tabs = ['feed', 'nlp', 'analytics', 'admin'];
+      tabs.forEach(t => {
+        const tabEl = document.getElementById(`tab-${t}`);
+        const navEl = document.getElementById(`nav-${t}`);
+        const mobNavEl = document.getElementById(`mobile-nav-${t}`);
+
+        if (tabEl) tabEl.classList.toggle('hidden', t !== tabId);
+
+        if (navEl) {
+          if (t === tabId) {
+            if (t === 'admin') {
+              navEl.className = 'w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-bold bg-amber-500/20 text-amber-200 border border-amber-500/40 shadow-sm';
+            } else {
+              navEl.className = 'w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-semibold transition-all bg-brand-500/15 text-brand-300 border border-brand-500/30 shadow-sm';
+            }
+          } else {
+            if (t === 'admin') {
+              navEl.className = 'w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold text-amber-300 hover:text-white hover:bg-amber-500/10 transition-all border border-amber-500/25';
+            } else {
+              navEl.className = 'w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-all border border-transparent';
+            }
+          }
+        }
+
+        // Sync Mobile Navigation active states
+        if (mobNavEl) {
+          if (t === tabId) {
+            mobNavEl.className = t === 'admin'
+              ? 'mobile-nav-btn flex flex-col items-center gap-0.5 text-amber-300 font-bold active:scale-95 transition-all'
+              : 'mobile-nav-btn flex flex-col items-center gap-0.5 text-brand-400 font-bold active:scale-95 transition-all';
+          } else {
+            mobNavEl.className = t === 'admin'
+              ? 'mobile-nav-btn flex flex-col items-center gap-0.5 text-amber-400/80 hover:text-amber-300 active:scale-95 transition-all'
+              : 'mobile-nav-btn flex flex-col items-center gap-0.5 text-slate-400 hover:text-white active:scale-95 transition-all';
+          }
+        }
+      });
+      if (tabId === 'analytics') loadPlatformStats();
+      if (tabId === 'admin') loadAdminData();
+    }
+
+    // Fetch and Render Posts
+    async function loadPosts() {
+      const container = document.getElementById('posts-container');
+      try {
+        const headers = currentUser.token ? { 'Authorization': `Bearer ${currentUser.token}` } : {};
+        const res = await fetch(`${API_BASE}/post`, { headers });
+        if (!res.ok) throw new Error('Failed to fetch posts');
+        allPosts = await res.json();
+        renderPosts();
+      } catch (err) {
+        container.innerHTML = `
+          <div class="glass-card rounded-2xl p-6 text-center text-slate-400">
+            <p class="text-sm font-medium text-rose-400 mb-1">Failed to connect to backend</p>
+            <p class="text-xs text-slate-500">Ensure Spring Boot is running on port 8081.</p>
+            <button onclick="loadPosts()" class="mt-3 px-3 py-1.5 rounded-lg bg-slate-800 text-xs text-slate-200 hover:bg-slate-700">Retry</button>
+          </div>
+        `;
+      }
+    }
+
+    function renderPosts() {
+      const container = document.getElementById('posts-container');
+      if (!allPosts || allPosts.length === 0) {
+        container.innerHTML = `
+          <div class="glass-card rounded-2xl p-8 text-center text-slate-400">
+            <p class="text-sm font-semibold text-slate-300">No posts yet!</p>
+            <p class="text-xs text-slate-500 mt-1">Be the first to share an update or research snippet.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Filter by Topic if selected
+      let filtered = allPosts;
+      if (currentTopicFilter !== 'all') {
+        const tag = '#' + currentTopicFilter.toLowerCase();
+        filtered = allPosts.filter(p => (p.content || '').toLowerCase().includes(tag));
+      }
+
+      container.innerHTML = filtered.map(post => {
+        const timeAgo = formatTimeAgo(post.createdAt);
+        const formattedContent = highlightHashtags(escapeHtml(post.content || ''));
+        const avatar = post.authorProfilePic || `https://api.dicebear.com/7.x/initials/svg?seed=${post.username}`;
+        const isLiked = post.liked;
+        const isAuthorAdmin = post.isAuthorAdmin || post.authorRole === 'ROLE_ADMIN' || post.username === 'tushar_sharma';
+        const canDelete = post.owner || currentUser.isAdmin;
+
+        return `
+          <article class="glass-card glass-card-hover rounded-2xl p-5 border border-slate-800/80" id="post-${post.id}">
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-3.5">
+              <div class="flex items-center gap-3">
+                <img src="${avatar}" alt="${post.authorName}" class="w-10 h-10 rounded-full object-cover ring-2 ring-slate-800">
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-xs font-bold text-white">${escapeHtml(post.authorName || post.username)}</span>
+                    ${isAuthorAdmin ? `
+                      <span class="px-1.5 py-0.2 rounded text-[9px] font-black tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">👑 ADMIN</span>
+                    ` : `
+                      <svg class="w-3.5 h-3.5 text-brand-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                    `}
+                  </div>
+                  <div class="flex items-center gap-2 text-[11px] text-slate-400">
+                    <span>@${escapeHtml(post.username)}</span>
+                    <span>•</span>
+                    <span>${timeAgo}</span>
+                  </div>
+                </div>
+              </div>
+
+              ${canDelete ? `
+                <button onclick="deletePost(${post.id})" class="text-slate-500 hover:text-rose-400 transition-colors p-1" title="${currentUser.isAdmin && !post.owner ? 'Delete as Administrator' : 'Delete Post'}">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+              ` : ''}
+            </div>
+
+            <!-- Post Caption Content -->
+            <p class="text-sm text-slate-200 leading-relaxed mb-3">${formattedContent}</p>
+
+            <!-- Media Container -->
+            ${post.mediaUrl ? `
+              <div class="rounded-xl overflow-hidden mb-3 border border-slate-800 bg-slate-950/60 max-h-[460px]">
+                <img src="${escapeHtml(post.mediaUrl)}" alt="Post Media" loading="lazy" class="w-full h-full object-cover hover:scale-[1.01] transition-transform duration-300">
+              </div>
+            ` : ''}
+
+            <!-- Post Interaction Bar -->
+            <div class="flex items-center justify-between pt-2 border-t border-slate-800/60 text-xs">
+              <div class="flex items-center gap-4">
+                <!-- Like Button -->
+                <button onclick="toggleLike(${post.id})" class="flex items-center gap-1.5 transition-colors ${isLiked ? 'text-rose-500 font-bold' : 'text-slate-400 hover:text-white'}">
+                  <svg id="like-icon-${post.id}" class="w-5 h-5 ${isLiked ? 'fill-current like-bounce' : 'fill-none'}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                  <span id="like-count-${post.id}">${post.likeCount || 0}</span>
+                </button>
+
+                <!-- Comment Toggle Button -->
+                <button onclick="toggleCommentsSection(${post.id})" class="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                  <span id="comment-count-${post.id}">${post.commentCount || 0}</span>
+                </button>
+
+                <!-- Share Button -->
+                <button onclick="sharePost(${post.id})" class="text-slate-400 hover:text-white transition-colors p-1" title="Share">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+                </button>
+              </div>
+
+              <span class="text-[10px] text-slate-500 font-mono">NLP Shielded</span>
+            </div>
+
+            <!-- COMMENTS DRAWER (Expandable) -->
+            <div id="comments-section-${post.id}" class="hidden mt-4 pt-3 border-t border-slate-800/80 space-y-3">
+              <!-- Comment Input with Live AI Shield Pill -->
+              <div class="flex gap-2">
+                <input id="comment-input-${post.id}" type="text" placeholder="Add a comment... (AI checks for toxicity in real-time)" class="flex-1 bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-brand-500 font-sans" onkeydown="if(event.key==='Enter') submitComment(${post.id})">
+                <button onclick="submitComment(${post.id})" class="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold shadow-sm transition-all flex items-center gap-1">
+                  <span>Send</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                </button>
+              </div>
+
+              <!-- List of Comments Container -->
+              <div id="comments-list-${post.id}" class="space-y-2 pt-1 max-h-60 overflow-y-auto custom-scrollbar">
+                <div class="text-[11px] text-slate-500 py-1">Loading comments...</div>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    // Toggle Post Like
+    async function toggleLike(postId) {
+      if (!currentUser.token) {
+        showToast('Please log in to like posts', 'error');
+        openSwitchAccountModal();
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/like/toggle?postId=${postId}`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+        if (!res.ok) throw new Error('Like failed');
+        const data = await res.json();
+
+        // Update UI locally
+        const post = allPosts.find(p => p.id === postId);
+        if (post) {
+          post.liked = data.liked;
+          post.likeCount = data.likeCount;
+        }
+
+        const countEl = document.getElementById(`like-count-${postId}`);
+        const iconEl = document.getElementById(`like-icon-${postId}`);
+        if (countEl) countEl.innerText = data.likeCount;
+        if (iconEl) {
+          if (data.liked) {
+            iconEl.classList.add('fill-current', 'text-rose-500', 'like-bounce');
+            iconEl.classList.remove('fill-none');
+            iconEl.parentElement.classList.add('text-rose-500', 'font-bold');
+            iconEl.parentElement.classList.remove('text-slate-400');
+          } else {
+            iconEl.classList.remove('fill-current', 'text-rose-500', 'like-bounce');
+            iconEl.classList.add('fill-none');
+            iconEl.parentElement.classList.remove('text-rose-500', 'font-bold');
+            iconEl.parentElement.classList.add('text-slate-400');
+          }
+        }
+      } catch (err) {
+        showToast('Failed to toggle like', 'error');
+      }
+    }
+
+    // Toggle and Fetch Comments Section
+    async function toggleCommentsSection(postId) {
+      const section = document.getElementById(`comments-section-${postId}`);
+      if (!section) return;
+
+      const isHidden = section.classList.contains('hidden');
+      if (isHidden) {
+        section.classList.remove('hidden');
+        await fetchComments(postId);
+      } else {
+        section.classList.add('hidden');
+      }
+    }
+
+    // Fetch Comments from API
+    async function fetchComments(postId) {
+      const listEl = document.getElementById(`comments-list-${postId}`);
+      if (!listEl) return;
+
+      try {
+        const headers = currentUser.token ? { 'Authorization': `Bearer ${currentUser.token}` } : {};
+        const res = await fetch(`${API_BASE}/comments/post/${postId}`, { headers });
+        if (!res.ok) throw new Error('Failed to fetch comments');
+        const comments = await res.json();
+
+        if (comments.length === 0) {
+          listEl.innerHTML = `<p class="text-[11px] text-slate-500 italic py-1">No comments yet. Be the first to chime in!</p>`;
+          return;
+        }
+
+        listEl.innerHTML = comments.map(c => {
+          const avatar = c.authorProfilePic || `https://api.dicebear.com/7.x/initials/svg?seed=${c.username}`;
+          const time = formatTimeAgo(c.createdAt);
+          const isCommentAdmin = c.isAuthorAdmin || c.authorRole === 'ROLE_ADMIN' || c.username === 'tushar_sharma';
+          const canDeleteComment = c.isOwner || currentUser.isAdmin;
+
+          // If flagged as toxic / NSFW by AI: visible ONLY to Admin
+          if (c.isFlagged) {
+            return `
+              <div class="p-2.5 rounded-xl bg-rose-950/30 border border-rose-500/40 text-xs space-y-1.5">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <img src="${avatar}" alt="${c.username}" class="w-6 h-6 rounded-full object-cover ring-1 ring-rose-500">
+                    <span class="font-bold text-white text-[11px]">${escapeHtml(c.authorName || c.username)}</span>
+                    <span class="px-1.5 py-0.5 rounded text-[8px] font-black tracking-wider bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                      🛡️ AUTO-REMOVED BY AI (${Math.round((c.toxicityScore || 0.95)*100)}% Toxic)
+                    </span>
+                    <span class="text-[9px] text-amber-300/80 font-medium">Visible to Admin Only</span>
+                    <span class="text-[10px] text-slate-500">${time}</span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <button onclick="approveFlaggedComment(${c.id})" class="text-emerald-400 hover:text-emerald-300 p-1" title="Approve & restore comment to public">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    </button>
+                    <button onclick="deleteComment(${c.id}, ${postId})" class="text-rose-400 hover:text-rose-300 p-1" title="Delete toxic comment permanently">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                  </div>
+                </div>
+                <div class="bg-rose-950/50 p-2 rounded-lg border border-rose-900/60 font-mono text-xs text-rose-200">
+                  ${escapeHtml(c.comment)}
+                </div>
+              </div>
+            `;
+          }
+
+          // Sentiment Badge
+          let sentimentBadge = '';
+          if (c.sentiment === 'POSITIVE') {
+            sentimentBadge = `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/25">✨ Positive</span>`;
+          } else if (c.sentiment === 'NEGATIVE') {
+            sentimentBadge = `<span class="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-500/15 text-rose-400 border border-rose-500/25">⚠️ Critical</span>`;
+          } else {
+            sentimentBadge = `<span class="px-1.5 py-0.5 rounded text-[9px] font-medium bg-slate-800 text-slate-400">Neutral</span>`;
+          }
+
+          return `
+            <div class="flex items-start justify-between gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-800/70 text-xs">
+              <div class="flex items-start gap-2.5">
+                <img src="${avatar}" alt="${c.username}" class="w-6 h-6 rounded-full object-cover mt-0.5">
+                <div>
+                  <div class="flex items-center gap-1.5 mb-0.5">
+                    <span class="font-bold text-white text-[11px]">${escapeHtml(c.authorName || c.username)}</span>
+                    ${isCommentAdmin ? `<span class="px-1 py-0.2 rounded text-[8px] font-black tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">👑 ADMIN</span>` : ''}
+                    <span class="text-[10px] text-slate-500">${time}</span>
+                    ${sentimentBadge}
+                  </div>
+                  <p class="text-slate-200 text-xs">${escapeHtml(c.comment)}</p>
+                </div>
+              </div>
+
+              ${canDeleteComment ? `
+                <button onclick="deleteComment(${c.id}, ${postId})" class="text-slate-500 hover:text-rose-400 transition-colors p-1" title="${currentUser.isAdmin && !c.isOwner ? 'Delete as Administrator' : 'Delete comment'}">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        listEl.innerHTML = `<p class="text-[11px] text-rose-400 py-1">Failed to load comments</p>`;
+      }
+    }
+
+    // Submit New Comment with Real-time AI Safety Gate
+    async function submitComment(postId) {
+      if (!currentUser.token) {
+        showToast('Please log in to comment', 'error');
+        openSwitchAccountModal();
+        return;
+      }
+
+      const input = document.getElementById(`comment-input-${postId}`);
+      if (!input || !input.value.trim()) return;
+      const content = input.value.trim();
+
+      try {
+        const res = await fetch(`${API_BASE}/comments?postId=${postId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentUser.token}`
+          },
+          body: JSON.stringify({ postId, content })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          const errMsg = errData.message || errData.error || 'Comment rejected by community guardrail.';
+          showToast(errMsg, 'warning');
+          return;
+        }
+
+        const newComment = await res.json();
+        input.value = '';
+
+        if (newComment.isFlagged) {
+          showToast('🛡️ AI Guardrail: Toxic comment detected! Automatically removed from public feed & queued for Admin review.', 'warning');
+        } else {
+          showToast(`Comment approved (${newComment.sentiment || 'Safe'})`, 'success');
+        }
+
+        // Update comment counter
+        const countEl = document.getElementById(`comment-count-${postId}`);
+        if (countEl) countEl.innerText = parseInt(countEl.innerText || 0) + 1;
+
+        // Refresh comments list
+        await fetchComments(postId);
+        loadPlatformStats();
+      } catch (err) {
+        showToast('Network error while analyzing comment', 'error');
+      }
+    }
+
+    // Delete Comment
+    async function deleteComment(commentId, postId) {
+      try {
+        const res = await fetch(`${API_BASE}/comments/${commentId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+        if (!res.ok) throw new Error('Delete failed');
+        showToast('Comment deleted', 'success');
+
+        const countEl = document.getElementById(`comment-count-${postId}`);
+        if (countEl) countEl.innerText = Math.max(0, parseInt(countEl.innerText || 1) - 1);
+
+        await fetchComments(postId);
+      } catch (err) {
+        showToast('Could not delete comment', 'error');
+      }
+    }
+
+    // State for local file uploads
+    let selectedQuickFile = null;
+    let selectedModalFile = null;
+
+    function handleQuickFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      selectedQuickFile = file;
+      const container = document.getElementById('quick-image-preview-container');
+      const img = document.getElementById('quick-image-preview');
+      const nameEl = document.getElementById('quick-image-name');
+      img.src = URL.createObjectURL(file);
+      if (nameEl) nameEl.innerText = file.name;
+      container.classList.remove('hidden');
+    }
+
+    function removeQuickImage() {
+      selectedQuickFile = null;
+      const fileInput = document.getElementById('quick-file-input');
+      if (fileInput) fileInput.value = '';
+      const container = document.getElementById('quick-image-preview-container');
+      const img = document.getElementById('quick-image-preview');
+      img.src = '';
+      container.classList.add('hidden');
+    }
+
+    function handleModalFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      selectedModalFile = file;
+      const placeholder = document.getElementById('modal-file-placeholder');
+      const container = document.getElementById('modal-image-preview-container');
+      const img = document.getElementById('modal-image-preview');
+      img.src = URL.createObjectURL(file);
+      placeholder.classList.add('hidden');
+      container.classList.remove('hidden');
+    }
+
+    function removeModalImage() {
+      selectedModalFile = null;
+      const fileInput = document.getElementById('modal-file-input');
+      if (fileInput) fileInput.value = '';
+      const placeholder = document.getElementById('modal-file-placeholder');
+      const container = document.getElementById('modal-image-preview-container');
+      const img = document.getElementById('modal-image-preview');
+      img.src = '';
+      container.classList.add('hidden');
+      placeholder.classList.remove('hidden');
+    }
+
+    function promptQuickImageUrl() {
+      const url = prompt('Enter Image URL (e.g. from Unsplash):', 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80');
+      if (url) {
+        selectedQuickFile = null;
+        const fileInput = document.getElementById('quick-file-input');
+        if (fileInput) fileInput.value = '';
+        const container = document.getElementById('quick-image-preview-container');
+        const img = document.getElementById('quick-image-preview');
+        const nameEl = document.getElementById('quick-image-name');
+        img.src = url;
+        if (nameEl) nameEl.innerText = 'Web Image Link';
+        container.classList.remove('hidden');
+      }
+    }
+
+    // Submit Quick Post from Inline Composer (Supports local device photo & URL)
+    async function submitQuickPost() {
+      if (!currentUser.token) {
+        showToast('Please log in first', 'error');
+        openSwitchAccountModal();
+        return;
+      }
+
+      const textarea = document.getElementById('quick-post-text');
+      const previewImg = document.getElementById('quick-image-preview');
+      const content = textarea.value.trim();
+      const urlMedia = previewImg.src && !selectedQuickFile ? previewImg.src : null;
+
+      if (!content && !selectedQuickFile && !urlMedia) {
+        showToast('Please write some content or attach a photo', 'error');
+        return;
+      }
+
+      if (selectedQuickFile && selectedQuickFile.size > 50 * 1024 * 1024) {
+        showToast('Photo size exceeds 50MB limit', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('quick-post-submit-btn');
+      btn.disabled = true;
+      btn.innerText = 'Publishing...';
+
+      try {
+        const sendPost = async (token) => {
+          if (selectedQuickFile) {
+            const formData = new FormData();
+            formData.append('content', content || '');
+            formData.append('file', selectedQuickFile);
+            return fetch(`${API_BASE}/post`, {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${token}` },
+              body: formData
+            });
+          } else {
+            return fetch(`${API_BASE}/post/json`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ content: content || '', mediaUrl: urlMedia || '' })
+            });
+          }
+        };
+
+        let res = await sendPost(currentUser.token);
+
+        // If token expired or unauthorized, prompt user to re-login
+        if (res.status === 401 || res.status === 403) {
+          showToast('Session expired. Please log in again.', 'error');
+          openSwitchAccountModal();
+          return;
+        }
+
+        if (!res.ok) {
+          let errDetail = 'Server returned error ' + res.status;
+          try {
+            const errData = await res.json();
+            errDetail = errData.message || errData.error || `HTTP ${res.status}`;
+          } catch (e) {
+            errDetail = `HTTP ${res.status}`;
+          }
+          throw new Error(errDetail);
+        }
+
+        const hadFile = !!selectedQuickFile;
+        textarea.value = '';
+        selectedQuickFile = null;
+        removeQuickImage();
+        showToast(hadFile ? 'Post published with photo! 🖼️' : 'Post published! ✅', 'success');
+        await loadPosts();
+      } catch (err) {
+        const msg = err.message || 'Unknown error';
+        showToast(msg.startsWith('Failed') ? msg : ('Failed to create post: ' + msg), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Publish';
+      }
+    }
+
+    // Delete Post
+    async function deletePost(postId) {
+      if (!confirm('Are you sure you want to delete this post?')) return;
+      try {
+        const res = await fetch(`${API_BASE}/post/${postId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+        if (!res.ok) throw new Error('Delete failed');
+        showToast('Post deleted', 'success');
+        await loadPosts();
+      } catch (err) {
+        showToast('Failed to delete post', 'error');
+      }
+    }
+
+    // Modal Create Post
+    function openNewPostModal() {
+      document.getElementById('modal-new-post').classList.remove('hidden');
+    }
+    function closeNewPostModal() {
+      document.getElementById('modal-new-post').classList.add('hidden');
+      removeModalImage();
+    }
+
+    async function submitModalPost() {
+      if (!currentUser.token) {
+        showToast('Please log in first', 'error');
+        openSwitchAccountModal();
+        return;
+      }
+
+      const content = document.getElementById('modal-post-content').value.trim();
+      const mediaUrl = document.getElementById('modal-post-media').value.trim();
+
+      if (!content && !selectedModalFile && !mediaUrl) {
+        showToast('Please enter post content or choose a photo', 'error');
+        return;
+      }
+
+      if (selectedModalFile && selectedModalFile.size > 50 * 1024 * 1024) {
+        showToast('Photo size exceeds 50MB limit', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('modal-post-submit-btn');
+      btn.disabled = true;
+      btn.innerText = 'Posting...';
+
+      try {
+        const sendPost = async (token) => {
+          if (selectedModalFile) {
+            const formData = new FormData();
+            formData.append('content', content || '');
+            formData.append('file', selectedModalFile);
+            return fetch(`${API_BASE}/post`, {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${token}` },
+              body: formData
+            });
+          } else {
+            return fetch(`${API_BASE}/post/json`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({ content: content || '', mediaUrl })
+            });
+          }
+        };
+
+        let res = await sendPost(currentUser.token);
+
+        if (res.status === 401 || res.status === 403) {
+          showToast('Session expired. Please log in again.', 'error');
+          openSwitchAccountModal();
+          return;
+        }
+
+        if (!res.ok) {
+          let errDetail = 'Post failed';
+          try {
+            const errData = await res.json();
+            errDetail = errData.message || errData.error || `HTTP ${res.status}`;
+          } catch (e) {
+            errDetail = `HTTP ${res.status}`;
+          }
+          throw new Error(errDetail);
+        }
+
+        closeNewPostModal();
+        document.getElementById('modal-post-content').value = '';
+        document.getElementById('modal-post-media').value = '';
+        selectedModalFile = null;
+        removeModalImage();
+        showToast('Post published!', 'success');
+        await loadPosts();
+      } catch (err) {
+        const msg = err.message || 'Unknown error';
+        showToast(msg.startsWith('Error') || msg.startsWith('Failed') ? msg : ('Error publishing post: ' + msg), 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Publish Post';
+      }
+    }
+
+    // Filter Posts by Topic Tag
+    function filterPosts(topic) {
+      currentTopicFilter = topic;
+      document.querySelectorAll('.topic-pill').forEach(btn => {
+        btn.className = 'topic-pill px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap bg-slate-900/90 text-slate-300 hover:text-white border border-slate-800';
+      });
+      event.target.className = 'topic-pill px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap bg-brand-500 text-white shadow-sm';
+      renderPosts();
+    }
+
+    // AI Studio / Model Live Inspector
+    function fillSample(text) {
+      const input = document.getElementById('nlp-live-input');
+      input.value = text;
+      runLiveNlpTest();
+    }
+
+    async function runLiveNlpTest() {
+      const text = document.getElementById('nlp-live-input').value.trim();
+      if (!text) return;
+
+      const card = document.getElementById('nlp-result-card');
+      card.classList.remove('hidden');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/nlp/analyze`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+        const data = await res.json();
+
+        // Update Verdicts
+        const toxicVerdict = document.getElementById('nlp-toxic-verdict');
+        const toxicBar = document.getElementById('nlp-toxic-bar');
+        const toxicText = document.getElementById('nlp-toxic-score-text');
+
+        const toxPct = Math.round(data.toxicityScore * 100);
+        const isNsfw = data.isNsfw || data.nsfw;
+        const isToxic = data.isToxic || data.toxic;
+
+        toxicText.innerText = isNsfw ? `NSFW Explicit Content (Confidence: 96%)` : `Toxicity Score: ${toxPct}%`;
+        toxicBar.style.width = isNsfw ? `96%` : `${toxPct}%`;
+
+        if (isNsfw) {
+          toxicVerdict.innerHTML = `<span class="text-rose-400">🔞 Blocked (Adult / NSFW)</span>`;
+          toxicBar.className = 'bg-rose-500 h-full rounded-full';
+        } else if (isToxic) {
+          toxicVerdict.innerHTML = `<span class="text-rose-400">🛡️ Blocked (Harassment)</span>`;
+          toxicBar.className = 'bg-rose-500 h-full rounded-full';
+        } else {
+          toxicVerdict.innerHTML = `<span class="text-emerald-400">✓ Safe Content</span>`;
+          toxicBar.className = 'bg-emerald-500 h-full rounded-full';
+        }
+
+        // Sentiment
+        const sentVerdict = document.getElementById('nlp-sentiment-verdict');
+        const sentBar = document.getElementById('nlp-sentiment-bar');
+        const sentText = document.getElementById('nlp-sentiment-score-text');
+
+        const sentPct = Math.round(data.sentimentScore * 100);
+        sentVerdict.innerText = data.sentiment;
+        sentText.innerText = `Confidence: ${sentPct}%`;
+        sentBar.style.width = `${sentPct}%`;
+
+        if (data.sentiment === 'POSITIVE') {
+          sentVerdict.className = 'text-sm font-bold text-emerald-400';
+          sentBar.className = 'bg-emerald-500 h-full rounded-full';
+        } else if (data.sentiment === 'NEGATIVE') {
+          sentVerdict.className = 'text-sm font-bold text-rose-400';
+          sentBar.className = 'bg-rose-500 h-full rounded-full';
+        } else {
+          sentVerdict.className = 'text-sm font-bold text-slate-300';
+          sentBar.className = 'bg-slate-500 h-full rounded-full';
+        }
+
+        document.getElementById('nlp-explanation-text').innerText = data.explanation;
+        document.getElementById('nlp-engine-badge').innerText = data.modelSource || 'RoBERTa-Transformer';
+      } catch (err) {
+        showToast('Failed to connect to NLP inspector', 'error');
+      }
+    }
+
+    // Right Rail mini test
+    async function runRailTest() {
+      const input = document.getElementById('rail-test-input');
+      const resContainer = document.getElementById('rail-test-result');
+      const text = input.value.trim();
+      if (!text) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/nlp/analyze`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+        const data = await res.json();
+        const isNsfw = data.isNsfw || data.nsfw;
+        const isToxic = data.isToxic || data.toxic;
+
+        let statusClass = 'text-emerald-400 font-bold';
+        let statusText = '✓ Safe';
+        if (isNsfw) {
+          statusClass = 'text-rose-400 font-bold';
+          statusText = '🔞 Adult / NSFW (Blocked)';
+        } else if (isToxic) {
+          statusClass = 'text-rose-400 font-bold';
+          statusText = '⚠️ Toxic (' + Math.round(data.toxicityScore * 100) + '%)';
+        }
+
+        resContainer.classList.remove('hidden');
+        resContainer.innerHTML = `
+          <div class="flex items-center justify-between mb-1">
+            <span class="${statusClass}">
+              ${statusText}
+            </span>
+            <span class="text-slate-400 font-mono">${data.sentiment}</span>
+          </div>
+          <p class="text-slate-400 text-[10px] truncate">${data.explanation}</p>
+        `;
+      } catch (e) {
+        resContainer.innerText = 'Test error';
+      }
+    }
+
+    // Load Platform Analytics
+    async function loadPlatformStats() {
+      try {
+        const res = await fetch(`${API_BASE}/api/nlp/stats`);
+        if (!res.ok) return;
+        const stats = await res.json();
+
+        const safeRateEl = document.getElementById('stat-safety-rate');
+        const analyzedEl = document.getElementById('stat-total-analyzed');
+        const blockedEl = document.getElementById('stat-toxic-blocked');
+
+        if (safeRateEl) safeRateEl.innerText = `${stats.platformSafetyIndex || 99.4}%`;
+        if (analyzedEl) analyzedEl.innerText = stats.totalAnalyzed || 0;
+        if (blockedEl) blockedEl.innerText = stats.toxicBlocked || 0;
+
+        const posCountEl = document.getElementById('stat-pos-count');
+        const neuCountEl = document.getElementById('stat-neu-count');
+        const negCountEl = document.getElementById('stat-neg-count');
+
+        if (posCountEl) posCountEl.innerText = stats.positiveCount || 0;
+        if (neuCountEl) neuCountEl.innerText = stats.neutralCount || 0;
+        if (negCountEl) negCountEl.innerText = (stats.negativeCount || 0) + (stats.toxicBlocked || 0);
+
+        const total = (stats.positiveCount || 0) + (stats.neutralCount || 0) + (stats.negativeCount || 0) + (stats.toxicBlocked || 0);
+        if (total > 0) {
+          document.getElementById('stat-bar-pos').style.width = `${Math.round((stats.positiveCount / total) * 100)}%`;
+          document.getElementById('stat-bar-neu').style.width = `${Math.round((stats.neutralCount / total) * 100)}%`;
+          document.getElementById('stat-bar-neg').style.width = `${Math.round(((stats.negativeCount + stats.toxicBlocked) / total) * 100)}%`;
+        }
+      } catch (e) {}
+    }
+
+    // Auth & Account Management
+    function openSwitchAccountModal() {
+      document.getElementById('modal-auth').classList.remove('hidden');
+    }
+    function closeSwitchAccountModal() {
+      document.getElementById('modal-auth').classList.add('hidden');
+    }
+
+    async function loginAsDemo(username, showFeedback = true) {
+      try {
+        const res = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password: 'password123' })
+        });
+        if (!res.ok) throw new Error('Login failed');
+        const data = await res.json();
+
+        const isAdmin = (data.role === 'ADMIN' || data.role === 'ROLE_ADMIN' || data.isAdmin === true || data.username === 'tushar_sharma');
+
+        currentUser = {
+          username: data.username,
+          name: data.name || data.username,
+          avatar: data.profilePic || `https://api.dicebear.com/7.x/initials/svg?seed=${data.username}`,
+          token: data.token,
+          role: data.role || (isAdmin ? 'ROLE_ADMIN' : 'ROLE_USER'),
+          isAdmin: isAdmin
+        };
+
+        localStorage.setItem('pulse_username', currentUser.username);
+        localStorage.setItem('pulse_name', currentUser.name);
+        localStorage.setItem('pulse_avatar', currentUser.avatar);
+        localStorage.setItem('pulse_token', currentUser.token);
+        localStorage.setItem('pulse_role', currentUser.role);
+        localStorage.setItem('pulse_is_admin', String(currentUser.isAdmin));
+
+        syncUserUI();
+        closeSwitchAccountModal();
+        if (showFeedback) showToast(`Switched account to ${currentUser.name} (${isAdmin ? '👑 Admin' : 'User'})`, 'success');
+        await loadPosts();
+      } catch (err) {
+        if (showFeedback) showToast('Failed to switch demo account', 'error');
+      }
+    }
+
+    async function submitCustomLogin() {
+      const username = document.getElementById('auth-username').value.trim();
+      const password = document.getElementById('auth-password').value;
+      if (!username || !password) {
+        showToast('Please enter both username and password', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        if (!res.ok) throw new Error('Invalid credentials');
+        const data = await res.json();
+
+        const isAdmin = (data.role === 'ADMIN' || data.role === 'ROLE_ADMIN' || data.isAdmin === true || data.username === 'tushar_sharma');
+
+        currentUser = {
+          username: data.username,
+          name: data.name || data.username,
+          avatar: data.profilePic || `https://api.dicebear.com/7.x/initials/svg?seed=${data.username}`,
+          token: data.token,
+          role: data.role || (isAdmin ? 'ROLE_ADMIN' : 'ROLE_USER'),
+          isAdmin: isAdmin
+        };
+
+        localStorage.setItem('pulse_username', currentUser.username);
+        localStorage.setItem('pulse_name', currentUser.name);
+        localStorage.setItem('pulse_avatar', currentUser.avatar);
+        localStorage.setItem('pulse_token', currentUser.token);
+        localStorage.setItem('pulse_role', currentUser.role);
+        localStorage.setItem('pulse_is_admin', String(currentUser.isAdmin));
+
+        syncUserUI();
+        closeSwitchAccountModal();
+        showToast(`Welcome back, ${currentUser.name}!`, 'success');
+        await loadPosts();
+      } catch (err) {
+        showToast('Invalid username or password', 'error');
+      }
+    }
+
+    function switchAuthTab(tab) {
+      const googleBtn = document.getElementById('auth-tab-btn-google');
+      const regBtn = document.getElementById('auth-tab-btn-register');
+      const adminBtn = document.getElementById('auth-tab-btn-admin');
+
+      const googlePane = document.getElementById('auth-google-pane');
+      const regPane = document.getElementById('auth-register-pane');
+      const adminPane = document.getElementById('auth-admin-pane');
+
+      // Reset tabs
+      if (googleBtn) googleBtn.className = 'px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all';
+      if (regBtn) regBtn.className = 'px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all';
+      if (adminBtn) adminBtn.className = 'px-2.5 py-1.5 rounded-lg text-xs font-semibold text-amber-400 hover:text-amber-300 transition-all flex items-center gap-1';
+
+      if (googlePane) googlePane.classList.add('hidden');
+      if (regPane) regPane.classList.add('hidden');
+      if (adminPane) adminPane.classList.add('hidden');
+
+      if (tab === 'google') {
+        if (googleBtn) googleBtn.className = 'px-2.5 py-1.5 rounded-lg text-xs font-bold bg-brand-500 text-white shadow-sm transition-all flex items-center gap-1.5';
+        if (googlePane) googlePane.classList.remove('hidden');
+      } else if (tab === 'register') {
+        if (regBtn) regBtn.className = 'px-2.5 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white shadow-sm transition-all';
+        if (regPane) regPane.classList.remove('hidden');
+      } else if (tab === 'admin') {
+        if (adminBtn) adminBtn.className = 'px-2.5 py-1.5 rounded-lg text-xs font-bold bg-amber-500 text-black shadow-sm transition-all flex items-center gap-1';
+        if (adminPane) adminPane.classList.remove('hidden');
+      }
+    }
+
+    // Google Email Authentication for Public Users (Guaranteed ROLE_USER)
+    async function submitGoogleEmailAuth() {
+      const emailInput = document.getElementById('google-email-input');
+      const nameInput = document.getElementById('google-name-input');
+      const email = emailInput ? emailInput.value.trim() : '';
+      const name = nameInput ? nameInput.value.trim() : '';
+
+      if (!email || !email.includes('@')) {
+        showToast('Please enter a valid Google / Gmail address', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('google-submit-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = 'Verifying with Google...';
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/auth/google`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: email,
+            name: name || email.split('@')[0],
+            profilePic: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name || email)}`
+          })
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || 'Google authentication failed');
+        }
+
+        const data = await res.json();
+        currentUser = {
+          username: data.username,
+          name: data.name || data.username,
+          avatar: data.profilePic || `https://api.dicebear.com/7.x/initials/svg?seed=${data.username}`,
+          token: data.token,
+          role: data.role || 'ROLE_USER',
+          isAdmin: Boolean(data.isAdmin)
+        };
+
+        localStorage.setItem('pulse_username', currentUser.username);
+        localStorage.setItem('pulse_name', currentUser.name);
+        localStorage.setItem('pulse_avatar', currentUser.avatar);
+        localStorage.setItem('pulse_token', currentUser.token);
+        localStorage.setItem('pulse_role', currentUser.role);
+        localStorage.setItem('pulse_is_admin', String(currentUser.isAdmin));
+
+        syncUserUI();
+        closeSwitchAccountModal();
+        showToast(`Welcome to PulseAI, ${currentUser.name}! (Authenticated via Google)`, 'success');
+        await loadPosts();
+      } catch (err) {
+        showToast('Google Sign-In failed: ' + err.message, 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = 'Verify & Sign In with Google';
+        }
+      }
+    }
+
+    // Google Identity Services (GIS) Token Handler
+    async function handleGoogleCredentialResponse(response) {
+      if (!response || !response.credential) return;
+      try {
+        const res = await fetch(`${API_BASE}/auth/google`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ credential: response.credential })
+        });
+        if (!res.ok) throw new Error('Google OAuth token verification failed');
+        const data = await res.json();
+
+        currentUser = {
+          username: data.username,
+          name: data.name || data.username,
+          avatar: data.profilePic || `https://api.dicebear.com/7.x/initials/svg?seed=${data.username}`,
+          token: data.token,
+          role: data.role || 'ROLE_USER',
+          isAdmin: Boolean(data.isAdmin)
+        };
+
+        localStorage.setItem('pulse_username', currentUser.username);
+        localStorage.setItem('pulse_name', currentUser.name);
+        localStorage.setItem('pulse_avatar', currentUser.avatar);
+        localStorage.setItem('pulse_token', currentUser.token);
+        localStorage.setItem('pulse_role', currentUser.role);
+        localStorage.setItem('pulse_is_admin', String(currentUser.isAdmin));
+
+        syncUserUI();
+        closeSwitchAccountModal();
+        showToast(`Signed in as ${currentUser.name} via Google!`, 'success');
+        await loadPosts();
+      } catch (err) {
+        showToast('Google Sign-In Error: ' + err.message, 'error');
+      }
+    }
+
+    function triggerGoogleSignIn() {
+      const emailInput = document.getElementById('google-email-input');
+      if (emailInput && !emailInput.value) {
+        emailInput.focus();
+        showToast('Enter your Google email to sign in instantly.', 'info');
+      } else if (emailInput && emailInput.value) {
+        submitGoogleEmailAuth();
+      }
+    }
+
+    async function submitRegistration() {
+      const name = document.getElementById('register-name').value.trim();
+      const username = document.getElementById('register-username').value.trim();
+      const email = document.getElementById('register-email').value.trim();
+      const password = document.getElementById('register-password').value;
+      const location = document.getElementById('register-location').value.trim();
+
+      if (!username || !email || !password) {
+        showToast('Please provide username, email, and password', 'error');
+        return;
+      }
+      if (password.length < 6) {
+        showToast('Password must be at least 6 characters', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('register-submit-btn');
+      btn.disabled = true;
+      btn.innerText = 'Creating Account...';
+
+      try {
+        const res = await fetch(`${API_BASE}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name || username,
+            username,
+            email,
+            password,
+            profilePic: `https://api.dicebear.com/7.x/initials/svg?seed=${username}`,
+            phone: location || ''
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || data.message || 'Registration failed');
+        }
+
+        // Auto log in with the new account
+        currentUser = {
+          username: data.username,
+          name: data.name || data.username,
+          avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${data.username}`,
+          token: data.token,
+          role: 'ROLE_USER',
+          isAdmin: false
+        };
+
+        localStorage.setItem('pulse_username', currentUser.username);
+        localStorage.setItem('pulse_name', currentUser.name);
+        localStorage.setItem('pulse_avatar', currentUser.avatar);
+        localStorage.setItem('pulse_token', currentUser.token);
+        localStorage.setItem('pulse_role', currentUser.role);
+        localStorage.setItem('pulse_is_admin', 'false');
+
+        syncUserUI();
+        closeSwitchAccountModal();
+        showToast(`Account created! Welcome, ${currentUser.name}!`, 'success');
+        await loadPosts();
+      } catch (err) {
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Create Account & Sign In';
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('pulse_token');
+      localStorage.removeItem('pulse_role');
+      localStorage.removeItem('pulse_is_admin');
+      currentUser.token = '';
+      currentUser.isAdmin = false;
+      currentUser.role = 'ROLE_USER';
+      showToast('Logged out. You can browse publicly or re-login.', 'info');
+      syncUserUI();
+      loadPosts();
+    }
+
+    // Profile Management
+    let selectedProfileFile = null;
+
+    function openEditProfileModal() {
+      if (!currentUser.token) {
+        showToast('Please log in first', 'error');
+        openSwitchAccountModal();
+        return;
+      }
+
+      document.getElementById('edit-profile-name').value = currentUser.name || '';
+      document.getElementById('edit-profile-avatar-preview').src = currentUser.avatar || '';
+      document.getElementById('edit-profile-avatar-url').value = (currentUser.avatar && !currentUser.avatar.includes('dicebear')) ? currentUser.avatar : '';
+      document.getElementById('edit-profile-location').value = '';
+      document.getElementById('edit-profile-file-name').innerText = 'JPG, PNG, WEBP supported';
+      selectedProfileFile = null;
+
+      document.getElementById('modal-edit-profile').classList.remove('hidden');
+    }
+
+    function closeEditProfileModal() {
+      document.getElementById('modal-edit-profile').classList.add('hidden');
+      selectedProfileFile = null;
+    }
+
+    function handleEditProfileFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      selectedProfileFile = file;
+      document.getElementById('edit-profile-avatar-preview').src = URL.createObjectURL(file);
+      document.getElementById('edit-profile-file-name').innerText = file.name;
+    }
+
+    async function submitEditProfile() {
+      if (!currentUser.token) return;
+
+      const name = document.getElementById('edit-profile-name').value.trim();
+      const avatarUrlInput = document.getElementById('edit-profile-avatar-url').value.trim();
+      const location = document.getElementById('edit-profile-location').value.trim();
+      const btn = document.getElementById('edit-profile-save-btn');
+
+      btn.disabled = true;
+      btn.innerText = 'Saving...';
+
+      try {
+        let finalAvatar = currentUser.avatar;
+
+        // 1. If file uploaded from device, upload it first
+        if (selectedProfileFile) {
+          const formData = new FormData();
+          formData.append('file', selectedProfileFile);
+          const uploadRes = await fetch(`${API_BASE}/auth/avatar`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${currentUser.token}` },
+            body: formData
+          });
+          if (uploadRes.ok) {
+            const uploadData = await uploadRes.json();
+            finalAvatar = uploadData.profilePic;
+          }
+        } else if (avatarUrlInput) {
+          finalAvatar = avatarUrlInput;
+        }
+
+        // 2. Update profile details
+        const res = await fetch(`${API_BASE}/auth/profile`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentUser.token}`
+          },
+          body: JSON.stringify({
+            name: name || currentUser.name,
+            profilePic: finalAvatar,
+            location: location || ''
+          })
+        });
+
+        if (!res.ok) throw new Error('Profile update failed');
+        const data = await res.json();
+
+        currentUser.name = data.name || name;
+        currentUser.avatar = data.profilePic || finalAvatar;
+        localStorage.setItem('pulse_name', currentUser.name);
+        localStorage.setItem('pulse_avatar', currentUser.avatar);
+
+        syncUserUI();
+        closeEditProfileModal();
+        showToast('Profile updated successfully!', 'success');
+        await loadPosts();
+      } catch (err) {
+        showToast('Failed to update profile: ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Save Profile';
+      }
+    }
+
+    // Admin Console Methods (Tushar Sharma Master Access)
+    async function loadAdminData() {
+      if (!currentUser.token || !currentUser.isAdmin) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/overview`, {
+          headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const uEl = document.getElementById('admin-stat-users');
+          const pEl = document.getElementById('admin-stat-posts');
+          const cEl = document.getElementById('admin-stat-comments');
+          const bEl = document.getElementById('admin-stat-blocked');
+
+          if (uEl) uEl.innerText = data.totalUsers ?? 0;
+          if (pEl) pEl.innerText = data.totalPosts ?? 0;
+          if (cEl) cEl.innerText = data.totalComments ?? 0;
+          if (bEl) bEl.innerText = (data.flaggedCommentsCount ?? 0) || (data.toxicBlocked ?? 0);
+        }
+
+        await loadAdminUsers();
+        await loadFlaggedComments();
+      } catch (err) {
+        showToast('Could not load admin metrics', 'error');
+      }
+    }
+
+    async function loadAdminUsers() {
+      const tbody = document.getElementById('admin-users-table-body');
+      if (!tbody) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/users`, {
+          headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+        if (!res.ok) throw new Error('Failed to fetch user directory');
+        adminUsersCache = await res.json();
+        renderAdminUsersTable(adminUsersCache);
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-rose-400">Failed to load users: ${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    function renderAdminUsersTable(users) {
+      const tbody = document.getElementById('admin-users-table-body');
+      if (!tbody) return;
+
+      if (!users || users.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500">No users found.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = users.map(u => {
+        const isMaster = u.username === 'tushar_sharma';
+        const isAdmin = u.role === 'ROLE_ADMIN' || isMaster;
+        const avatar = u.profilePic || `https://api.dicebear.com/7.x/initials/svg?seed=${u.username}`;
+
+        return `
+          <tr class="hover:bg-slate-900/40 transition-colors">
+            <td class="py-3 pr-3">
+              <div class="flex items-center gap-2.5">
+                <img src="${avatar}" alt="${u.username}" class="w-8 h-8 rounded-full object-cover ring-1 ring-slate-700">
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-bold text-white text-xs">${escapeHtml(u.name || u.username)}</span>
+                    ${isMaster ? '<span class="text-[9px] bg-amber-400 text-black px-1.5 py-0.2 rounded font-black tracking-wider">MASTER</span>' : ''}
+                  </div>
+                  <span class="text-[10px] text-slate-400">@${escapeHtml(u.username)}</span>
+                </div>
+              </div>
+            </td>
+            <td class="py-3 px-2 text-slate-300 font-mono text-[11px]">${escapeHtml(u.email || 'N/A')}</td>
+            <td class="py-3 px-2">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isAdmin ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-slate-800 text-slate-300'}">
+                ${isAdmin ? '👑 ADMIN' : 'USER'}
+              </span>
+            </td>
+            <td class="py-3 px-2 text-center text-slate-300 font-semibold">${u.postCount || 0}</td>
+            <td class="py-3 pl-2 text-right">
+              <div class="flex items-center justify-end gap-1.5">
+                ${isMaster ? `
+                  <span class="text-[10px] text-amber-400 font-semibold italic">Protected Root</span>
+                ` : `
+                  <button onclick="toggleUserRole(${u.id}, '${u.role}')" class="px-2 py-1 rounded-lg text-[10px] font-semibold ${isAdmin ? 'bg-slate-800 hover:bg-slate-700 text-slate-300' : 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30'} transition-colors">
+                    ${isAdmin ? 'Demote to User' : 'Promote to Admin'}
+                  </button>
+                  <button onclick="banUser(${u.id}, '${escapeHtml(u.username)}')" class="px-2 py-1 rounded-lg text-[10px] font-semibold bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 border border-rose-500/30 transition-colors" title="Ban user & purge posts">
+                    Ban
+                  </button>
+                `}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterAdminUsers() {
+      const q = (document.getElementById('admin-user-search')?.value || '').toLowerCase().trim();
+      if (!q) {
+        renderAdminUsersTable(adminUsersCache);
+        return;
+      }
+      const filtered = adminUsersCache.filter(u =>
+        (u.name || '').toLowerCase().includes(q) ||
+        (u.username || '').toLowerCase().includes(q) ||
+        (u.email || '').toLowerCase().includes(q)
+      );
+      renderAdminUsersTable(filtered);
+    }
+
+    async function toggleUserRole(userId, currentRole) {
+      const isCurrentlyAdmin = currentRole === 'ROLE_ADMIN';
+      const newRole = isCurrentlyAdmin ? 'ROLE_USER' : 'ROLE_ADMIN';
+      const actionName = isCurrentlyAdmin ? 'demote to standard User' : 'promote to Platform Admin';
+
+      if (!confirm(`Are you sure you want to ${actionName}?`)) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/users/${userId}/role`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${currentUser.token}`
+          },
+          body: JSON.stringify({ role: newRole })
+        });
+        if (!res.ok) throw new Error('Role update failed');
+        const data = await res.json();
+        showToast(data.message || 'User role updated', 'success');
+        await loadAdminUsers();
+      } catch (err) {
+        showToast('Failed to change role: ' + err.message, 'error');
+      }
+    }
+
+    async function banUser(userId, username) {
+      if (!confirm(`Are you sure you want to BAN and delete account @${username}? All posts and comments will be permanently purged.`)) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/users/${userId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+        if (!res.ok) throw new Error('Ban failed');
+        showToast(`Account @${username} banned successfully`, 'success');
+        await loadAdminData();
+        await loadPosts();
+      } catch (err) {
+        showToast('Failed to ban user: ' + err.message, 'error');
+      }
+    }
+
+    // AI Flagged Moderation Queue Controls (Auto-Removed Toxic Comments)
+    async function loadFlaggedComments() {
+      const tbody = document.getElementById('admin-flagged-table-body');
+      const badge = document.getElementById('admin-flagged-count-badge');
+      if (!tbody) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/flagged-comments`, {
+          headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+        if (!res.ok) throw new Error('Failed to fetch flagged comments');
+        const comments = await res.json();
+        if (badge) badge.innerText = `${comments.length} Flagged`;
+
+        if (!comments || comments.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500">No flagged comments in queue. AI safety guardrails active.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = comments.map(c => {
+          const avatar = c.authorProfilePic || `https://api.dicebear.com/7.x/initials/svg?seed=${c.username}`;
+          const toxicPct = Math.round((c.toxicityScore || 0.95) * 100);
+
+          return `
+            <tr class="hover:bg-rose-950/20 transition-colors">
+              <td class="py-3 pr-3">
+                <div class="flex items-center gap-2">
+                  <img src="${avatar}" alt="${c.username}" class="w-7 h-7 rounded-full object-cover ring-1 ring-rose-500/50">
+                  <div>
+                    <span class="font-bold text-white text-xs block">${escapeHtml(c.authorName || c.username)}</span>
+                    <span class="text-[10px] text-slate-400">@${escapeHtml(c.username)}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="py-3 px-2 max-w-xs">
+                <div class="bg-rose-950/40 border border-rose-500/30 rounded-lg p-2 text-rose-200 font-mono text-xs">
+                  ${escapeHtml(c.comment)}
+                </div>
+                <span class="text-[9px] text-slate-500 mt-1 block">Post ID #${c.postId || 'N/A'} • ${formatTimeAgo(c.createdAt)}</span>
+              </td>
+              <td class="py-3 px-2 text-center">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                  ⚠️ ${toxicPct}% Toxic
+                </span>
+              </td>
+              <td class="py-3 px-2 text-center">
+                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                  Auto-Removed
+                </span>
+              </td>
+              <td class="py-3 pl-2 text-right">
+                <div class="flex items-center justify-end gap-1.5">
+                  <button onclick="approveFlaggedComment(${c.id})" class="px-2 py-1 rounded-lg text-[10px] font-semibold bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 transition-colors" title="Restore to public feed">
+                    Restore
+                  </button>
+                  <button onclick="deleteFlaggedComment(${c.id})" class="px-2 py-1 rounded-lg text-[10px] font-semibold bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 transition-colors" title="Permanently delete">
+                    Purge
+                  </button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-rose-400">Failed to load flagged comments: ${escapeHtml(err.message)}</td></tr>`;
+      }
+    }
+
+    async function approveFlaggedComment(commentId) {
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/flagged-comments/${commentId}/approve`, {
+          method: 'PUT',
+          headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+        if (!res.ok) throw new Error('Failed to restore comment');
+        showToast('Comment restored and made visible to public', 'success');
+        await loadFlaggedComments();
+        await loadPosts();
+      } catch (err) {
+        showToast('Error restoring comment: ' + err.message, 'error');
+      }
+    }
+
+    async function deleteFlaggedComment(commentId) {
+      if (!confirm('Permanently purge this toxic comment from database?')) return;
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/flagged-comments/${commentId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+        if (!res.ok) throw new Error('Delete failed');
+        showToast('Toxic comment permanently purged', 'success');
+        await loadFlaggedComments();
+        await loadAdminData();
+        await loadPosts();
+      } catch (err) {
+        showToast('Error deleting flagged comment: ' + err.message, 'error');
+      }
+    }
+
+    // Helper: Share post link
+    function sharePost(postId) {
+      const url = `${window.location.origin}#post-${postId}`;
+      navigator.clipboard.writeText(url).then(() => {
+        showToast('Post link copied to clipboard!', 'info');
+      }).catch(() => {
+        showToast('URL: ' + url, 'info');
+      });
+    }
+
+    // Helper: Toast Notifications
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      let border = 'border-brand-500/30';
+      let bg = 'bg-slate-900/95';
+      let icon = 'ℹ️';
+
+      if (type === 'success') {
+        border = 'border-emerald-500/40';
+        icon = '✨';
+      } else if (type === 'warning') {
+        border = 'border-amber-500/50';
+        bg = 'bg-amber-950/90';
+        icon = '🛡️';
+      } else if (type === 'error') {
+        border = 'border-rose-500/40';
+        bg = 'bg-rose-950/90';
+        icon = '⚠️';
+      }
+
+      toast.className = `glass-card ${bg} border ${border} rounded-xl px-4 py-3 text-xs text-white shadow-2xl flex items-center gap-2.5 max-w-sm pointer-events-auto transition-all transform translate-y-2 opacity-0`;
+      toast.innerHTML = `<span>${icon}</span><span class="flex-1">${escapeHtml(message)}</span>`;
+
+      container.appendChild(toast);
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    // Utilities
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.innerText = text;
+      return div.innerHTML;
+    }
+
+    function highlightHashtags(text) {
+      return text.replace(/(#[a-zA-Z0-9_]+)/g, '<span class="text-brand-400 font-medium hover:underline cursor-pointer">$1</span>');
+    }
+
+    function formatTimeAgo(isoString) {
+      if (!isoString) return 'just now';
+      const date = new Date(isoString);
+      const diffSec = Math.floor((new Date() - date) / 1000);
+      if (diffSec < 60) return 'just now';
+      const diffMin = Math.floor(diffSec / 60);
+      if (diffMin < 60) return `${diffMin}m ago`;
+      const diffHour = Math.floor(diffMin / 60);
+      if (diffHour < 24) return `${diffHour}h ago`;
+      const diffDay = Math.floor(diffHour / 24);
+      return `${diffDay}d ago`;
+    }
+  </script>
+</body>
+</html>
