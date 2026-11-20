@@ -21,10 +21,6 @@ RUN mkdir -p /app/data /app/uploads
 COPY --from=builder /app/target/*.jar app.jar
 
 # Expose the port Railway will map
-EXPOSE 8081
+EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD wget -qO- http://localhost:8081/ || exit 1
-
-ENTRYPOINT ["java", "-Xms256m", "-Xmx512m", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "java -Xms256m -Xmx512m -jar app.jar --server.port=${PORT:-8080}"]
