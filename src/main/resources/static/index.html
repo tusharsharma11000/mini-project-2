@@ -156,18 +156,18 @@
       <div class="glass-card rounded-2xl p-3 border border-slate-800/80">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2.5 overflow-hidden">
-            <img id="sidebar-user-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Avatar" class="w-9 h-9 rounded-full object-cover ring-2 ring-brand-500/40">
+            <img id="sidebar-user-avatar" src="https://api.dicebear.com/7.x/identicon/svg?seed=guest" alt="Avatar" class="w-9 h-9 rounded-full object-cover ring-2 ring-brand-500/40">
             <div class="truncate">
               <div class="flex items-center gap-1">
-                <p id="sidebar-user-name" class="text-xs font-bold text-white truncate">Tushar Sharma</p>
+                <p id="sidebar-user-name" class="text-xs font-bold text-white truncate">Guest User</p>
                 <span id="sidebar-user-admin-badge" class="hidden text-[9px] font-black bg-amber-500/20 text-amber-300 px-1 py-0.2 rounded border border-amber-500/30">ADMIN</span>
               </div>
-              <p id="sidebar-user-handle" class="text-[11px] text-slate-400 truncate">@tushar_sharma</p>
+              <p id="sidebar-user-handle" class="text-[11px] text-slate-400 truncate">Sign in to participate</p>
             </div>
           </div>
-          <span id="sidebar-user-role-pill" class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">Active</span>
+          <span id="sidebar-user-role-pill" class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-400 border border-slate-700">Guest</span>
         </div>
-        <div class="flex gap-1.5">
+        <div id="sidebar-logged-in-actions" class="hidden flex gap-1.5">
           <button onclick="openEditProfileModal()" class="flex-1 py-1.5 px-2 rounded-lg bg-slate-800/80 hover:bg-slate-700/80 text-[11px] font-medium text-slate-200 transition-colors text-center" title="Edit your name & profile picture">
             Edit Profile
           </button>
@@ -176,6 +176,12 @@
           </button>
           <button onclick="logout()" class="py-1.5 px-2.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 text-[11px] font-medium transition-colors" title="Logout">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          </button>
+        </div>
+        <div id="sidebar-guest-actions">
+          <button onclick="openSwitchAccountModal()" class="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md shadow-brand-500/20 transition-all flex items-center justify-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            <span>Sign In / Join</span>
           </button>
         </div>
       </div>
@@ -951,53 +957,68 @@
   <script>
     const API_BASE = window.location.origin;
 
-    // Current State
+    // Current State — Default is Guest (unauthenticated)
     let currentUser = {
-      username: localStorage.getItem('pulse_username') || 'tushar_sharma',
-      name: localStorage.getItem('pulse_name') || 'Tushar Sharma',
-      avatar: localStorage.getItem('pulse_avatar') || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80',
+      username: localStorage.getItem('pulse_username') || '',
+      name: localStorage.getItem('pulse_name') || 'Guest User',
+      avatar: localStorage.getItem('pulse_avatar') || 'https://api.dicebear.com/7.x/identicon/svg?seed=guest',
       token: localStorage.getItem('pulse_token') || '',
-      role: localStorage.getItem('pulse_role') || 'ROLE_ADMIN',
-      isAdmin: localStorage.getItem('pulse_is_admin') === 'true' || (localStorage.getItem('pulse_username') === 'tushar_sharma')
+      role: localStorage.getItem('pulse_role') || 'ROLE_USER',
+      isAdmin: false
     };
 
     let allPosts = [];
     let currentTopicFilter = 'all';
     let adminUsersCache = [];
 
-    // Application Initialization
+    // Application Initialization — Land directly on login modal for unauthenticated visitors
     document.addEventListener('DOMContentLoaded', async () => {
-      syncUserUI();
-      // Check if current token is valid; if missing or expired, refresh session
       let tokenValid = false;
       if (currentUser.token) {
         try {
           const check = await fetch(`${API_BASE}/auth/me`, {
             headers: { 'Authorization': `Bearer ${currentUser.token}` }
           });
-          if (check.ok) tokenValid = true;
+          if (check.ok) {
+            tokenValid = true;
+            const userData = await check.json();
+            currentUser.username = userData.username;
+            currentUser.name = userData.name || userData.username;
+            currentUser.role = userData.role;
+            currentUser.isAdmin = (userData.role === 'ADMIN' || userData.role === 'ROLE_ADMIN' || userData.isAdmin === true);
+            if (userData.profilePic) currentUser.avatar = userData.profilePic;
+          }
         } catch (e) {}
       }
+
       if (!tokenValid) {
-        // Only auto-login demo accounts (tushar_sharma, data_wizard, tech_lead)
-        // Google-authenticated users must log in again via the modal
-        const demoAccounts = ['tushar_sharma', 'data_wizard', 'tech_lead'];
-        if (demoAccounts.includes(currentUser.username)) {
-          await loginAsDemo(currentUser.username, false);
-        } else {
-          // Clear stale session for non-demo accounts, show login prompt
-          currentUser.token = '';
-          localStorage.removeItem('pulse_token');
-        }
+        // Clear any stale demo session so strangers are never auto-logged-in
+        currentUser.token = '';
+        currentUser.username = '';
+        currentUser.name = 'Guest User';
+        currentUser.avatar = 'https://api.dicebear.com/7.x/identicon/svg?seed=guest';
+        currentUser.isAdmin = false;
+        currentUser.role = 'ROLE_USER';
+        localStorage.removeItem('pulse_token');
+        localStorage.removeItem('pulse_username');
+        localStorage.removeItem('pulse_name');
+        localStorage.removeItem('pulse_avatar');
+        localStorage.removeItem('pulse_role');
+        localStorage.removeItem('pulse_is_admin');
+
+        // Immediately open Login / Sign In modal for everyone landing on the page
+        openSwitchAccountModal();
       }
+
+      syncUserUI();
       loadPosts();
       loadPlatformStats();
     });
 
     // Synchronize User profile across UI elements
     function syncUserUI() {
-      // Determine if current user has admin privileges
-      const isAdmin = (currentUser.role === 'ROLE_ADMIN') || (currentUser.role === 'ADMIN') || (currentUser.username === 'tushar_sharma');
+      const isLoggedIn = !!currentUser.token && !!currentUser.username;
+      const isAdmin = isLoggedIn && ((currentUser.role === 'ROLE_ADMIN') || (currentUser.role === 'ADMIN') || (currentUser.username === 'tushar_sharma'));
       currentUser.isAdmin = isAdmin;
 
       const nameEls = [document.getElementById('sidebar-user-name')];
@@ -1008,11 +1029,17 @@
         document.getElementById('composer-user-avatar')
       ];
 
-      nameEls.forEach(el => { if (el) el.innerText = currentUser.name; });
-      handleEls.forEach(el => { if (el) el.innerText = '@' + currentUser.username; });
+      nameEls.forEach(el => { if (el) el.innerText = isLoggedIn ? currentUser.name : 'Guest User'; });
+      handleEls.forEach(el => { if (el) el.innerText = isLoggedIn ? ('@' + currentUser.username) : 'Sign in to participate'; });
       avatarEls.forEach(el => { if (el) el.src = currentUser.avatar; });
 
-      // Admin Console Nav button visibility
+      // Sidebar Action Buttons (Toggle Logged In vs Guest Sign-In button)
+      const loggedInActions = document.getElementById('sidebar-logged-in-actions');
+      const guestActions = document.getElementById('sidebar-guest-actions');
+      if (loggedInActions) loggedInActions.classList.toggle('hidden', !isLoggedIn);
+      if (guestActions) guestActions.classList.toggle('hidden', isLoggedIn);
+
+      // Admin Console Nav button visibility (Protected: only visible when authenticated as admin)
       const navAdmin = document.getElementById('nav-admin');
       if (navAdmin) navAdmin.classList.toggle('hidden', !isAdmin);
 
@@ -1023,7 +1050,10 @@
       // Role Pill in sidebar
       const rolePill = document.getElementById('sidebar-user-role-pill');
       if (rolePill) {
-        if (isAdmin) {
+        if (!isLoggedIn) {
+          rolePill.className = 'px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-400 border border-slate-700';
+          rolePill.innerText = 'Guest';
+        } else if (isAdmin) {
           rolePill.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30';
           rolePill.innerText = '👑 Admin';
         } else {
@@ -2157,13 +2187,22 @@
 
     function logout() {
       localStorage.removeItem('pulse_token');
+      localStorage.removeItem('pulse_username');
+      localStorage.removeItem('pulse_name');
+      localStorage.removeItem('pulse_avatar');
       localStorage.removeItem('pulse_role');
       localStorage.removeItem('pulse_is_admin');
-      currentUser.token = '';
-      currentUser.isAdmin = false;
-      currentUser.role = 'ROLE_USER';
-      showToast('Logged out. You can browse publicly or re-login.', 'info');
+      currentUser = {
+        username: '',
+        name: 'Guest User',
+        avatar: 'https://api.dicebear.com/7.x/identicon/svg?seed=guest',
+        token: '',
+        role: 'ROLE_USER',
+        isAdmin: false
+      };
+      showToast('Logged out. Please sign in to participate.', 'info');
       syncUserUI();
+      openSwitchAccountModal();
       loadPosts();
     }
 
