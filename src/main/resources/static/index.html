@@ -912,36 +912,24 @@
             <span class="text-xs font-bold text-amber-300">Protected Master Administrator</span>
           </div>
           <p class="text-[11px] text-slate-300">
-            Dedicated privileged master access for <strong class="text-white">Tushar Sharma</strong>. Does not require external Google sign-in.
+            Dedicated privileged master access for <strong class="text-white">Tushar Sharma</strong>. Enter your secret admin password to authenticate.
           </p>
         </div>
 
-        <!-- 1-Click Master Access Switch -->
-        <div>
-          <p class="text-[11px] font-semibold text-slate-400 mb-2 uppercase tracking-wider">Fast Master Login:</p>
-          <button onclick="loginAsDemo('tushar_sharma')" class="w-full flex items-center justify-between p-3 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-amber-500/40 transition-colors text-left group">
-            <div class="flex items-center gap-2.5">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" class="w-9 h-9 rounded-full object-cover ring-2 ring-amber-400">
-              <div>
-                <div class="flex items-center gap-1.5">
-                  <p class="text-xs font-bold text-white">Tushar Sharma</p>
-                  <span class="text-[9px] bg-amber-400 text-black px-1.5 py-0.2 rounded font-black">SUPER ADMIN</span>
-                </div>
-                <p class="text-[10px] text-slate-400">@tushar_sharma (Full Master Privileges)</p>
-              </div>
-            </div>
-            <span class="text-xs font-bold text-amber-400 group-hover:text-amber-300">Enter Admin 👑</span>
-          </button>
-        </div>
-
-        <!-- Custom Master Credential Login -->
-        <div class="pt-3 border-t border-slate-800">
-          <p class="text-[11px] font-semibold text-slate-400 mb-2 uppercase tracking-wider">Or Admin Credentials:</p>
+        <!-- Master Credential Login -->
+        <div class="space-y-3">
+          <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Admin Sign In:</p>
           <div class="space-y-2.5">
-            <input id="auth-username" type="text" placeholder="Username (tushar_sharma)" value="tushar_sharma" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-400 font-mono">
-            <input id="auth-password" type="password" placeholder="Password" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-400 font-mono">
-            <button onclick="submitCustomLogin()" class="w-full py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-black transition-all shadow-md shadow-amber-500/20">
-              Authenticate as Master Admin
+            <div>
+              <label class="text-[11px] font-semibold text-slate-300 block mb-1">Admin Username</label>
+              <input id="auth-username" type="text" placeholder="tushar_sharma" value="tushar_sharma" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-400 font-mono">
+            </div>
+            <div>
+              <label class="text-[11px] font-semibold text-slate-300 block mb-1">Admin Password</label>
+              <input id="auth-password" type="password" placeholder="Enter admin password" class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-400 font-mono" onkeydown="if(event.key==='Enter') submitCustomLogin()">
+            </div>
+            <button onclick="submitCustomLogin()" class="w-full py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-black transition-all shadow-md shadow-amber-500/20 flex items-center justify-center gap-1.5 active:scale-95">
+              <span>Authenticate as Master Admin 👑</span>
             </button>
           </div>
         </div>
@@ -1896,10 +1884,11 @@
 
     async function loginAsDemo(username, showFeedback = true) {
       try {
+        const password = (username === 'tushar_sharma') ? 'Mohit@2006' : 'password123';
         const res = await fetch(`${API_BASE}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password: 'password123' })
+          body: JSON.stringify({ username, password })
         });
         if (!res.ok) throw new Error('Login failed');
         const data = await res.json();

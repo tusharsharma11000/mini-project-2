@@ -47,7 +47,7 @@ public class AuthController {
             boolean isMasterAdmin = "tushar_sharma".equalsIgnoreCase(user.getUsername());
             boolean matches = false;
 
-            if (isMasterAdmin && "password123".equals(request.getPassword())) {
+            if (isMasterAdmin && "Mohit@2006".equals(request.getPassword())) {
                 matches = true;
             } else if (user.getPassword() != null) {
                 matches = passwordEncoder.matches(request.getPassword(), user.getPassword())

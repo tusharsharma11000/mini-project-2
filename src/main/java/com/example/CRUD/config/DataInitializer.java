@@ -28,19 +28,12 @@ public class DataInitializer implements CommandLineRunner {
             // Check if demo user already exists
             User user1 = userRepository.findByUsername("tushar_sharma");
             if (user1 != null) {
-                // Ensure Tushar Sharma has full Admin privileges
-                boolean modified = false;
+                // Ensure Tushar Sharma has full Admin privileges and latest password
                 if (user1.getUserInfo() != null && user1.getUserInfo().getRole() != Role.ROLE_ADMIN) {
                     user1.getUserInfo().setRole(Role.ROLE_ADMIN);
-                    modified = true;
                 }
-                if (user1.getPassword() == null || user1.getPassword().isBlank()) {
-                    user1.setPassword("password123");
-                    modified = true;
-                }
-                if (modified) {
-                    userRepository.save(user1);
-                }
+                user1.setPassword("Mohit@2006");
+                userRepository.save(user1);
             } else {
                 log.info("Seeding initial demo data for social feed and AI moderation...");
 
@@ -48,7 +41,7 @@ public class DataInitializer implements CommandLineRunner {
                 user1 = new User();
                 user1.setUsername("tushar_sharma");
                 user1.setEmail("tushar@example.com");
-                user1.setPassword("password123");
+                user1.setPassword("Mohit@2006");
 
                 UserInfo info1 = new UserInfo();
                 info1.setName("Tushar Sharma");
