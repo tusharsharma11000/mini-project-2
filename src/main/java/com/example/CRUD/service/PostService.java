@@ -61,10 +61,15 @@ public class PostService {
             isOwner = authorUsername.equals(currentUsername) || isViewerAdmin;
         }
 
+        String mediaUrl = post.getMediaUrl();
+        if (mediaUrl != null && (mediaUrl.isBlank() || mediaUrl.equalsIgnoreCase("null") || mediaUrl.endsWith("/") || mediaUrl.endsWith(".railway.app") || mediaUrl.endsWith(".railway.app/"))) {
+            mediaUrl = null;
+        }
+
         return PostResponseDto.builder()
                 .id(post.getId())
                 .content(post.getContent())
-                .mediaUrl(post.getMediaUrl())
+                .mediaUrl(mediaUrl)
                 .createdAt(post.getCreatedAt())
                 .username(authorUsername)
                 .authorName(authorName)
@@ -125,7 +130,12 @@ public class PostService {
         Post post = new Post();
         post.setContent(content != null ? content : "");
         post.setUser(user);
-        post.setMediaUrl(mediaUrl);
+        
+        if (mediaUrl != null && !mediaUrl.isBlank() && !mediaUrl.equalsIgnoreCase("null") && !mediaUrl.endsWith("/")) {
+            post.setMediaUrl(mediaUrl.trim());
+        } else {
+            post.setMediaUrl(null);
+        }
 
         Post saved = postRepository.save(post);
         return toDto(saved, username);

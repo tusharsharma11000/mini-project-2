@@ -40,8 +40,11 @@ public class FileUploadService {
         }
 
         try {
-            // Clean filename and generate UUID
+            // Clean filename and handle extension safely (iOS HEIC, JPG, PNG, etc.)
             String originalName = file.getOriginalFilename() != null ? file.getOriginalFilename().replaceAll("[^a-zA-Z0-9.-]", "_") : "image.jpg";
+            if (!originalName.contains(".")) {
+                originalName += ".jpg";
+            }
             String fileName = UUID.randomUUID() + "_" + originalName;
 
             // 1. Ensure local uploads directory exists
